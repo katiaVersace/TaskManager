@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.alten.springboot.taskmanager.entity.Employee;
 import com.alten.springboot.taskmanager.entity.Task;
@@ -18,7 +20,7 @@ public class AssignTaskToTeam {
 	
 		System.out.println("-----------------");
 
-		testNegativo();
+//		testNegativo();
 	}
 
 	public static void testPositivo() {
@@ -42,11 +44,14 @@ public class AssignTaskToTeam {
 		Task task_C = new Task("TASK C", LocalDate.parse("2019-12-17"), null, LocalDate.parse("2019-12-19"), null);
 		Task task_D = new Task("TASK D", LocalDate.parse("2019-12-17"), null, LocalDate.parse("2019-12-17"), null);
 		Task task_E = new Task("TASK E", LocalDate.parse("2019-12-23"), null, LocalDate.parse("2019-12-23"), null);
+		Task task_F = new Task("TASK F", LocalDate.parse("2019-12-20"), null, LocalDate.parse("2019-12-20"), null);
 		
 		luca.getTasks().add(task_D);
 		luca.getTasks().add(task_B);
+		luca.getTasks().add(task_F);
 		task_D.setEmployee(luca);
 		task_B.setEmployee(luca);
+		task_F.setEmployee(luca);
 		
 		katia.getTasks().add(task_C);
 		katia.getTasks().add(task_E);
@@ -62,84 +67,96 @@ public class AssignTaskToTeam {
 		printTaskSchedule(task_A, start, end);
 
 		List<Task> visti = new ArrayList<>();
-		if(assignTaskToTeam(task_A, team1.getEmployees(), visti))
-			System.out.println("Assegnamento riuscito"+", all'impiegato: "+task_A.getEmployee().getUserName());
+		Map<Task, Employee> solution = new HashMap<>();
+		if(assignTaskToTeam(task_A, team1.getEmployees(), visti, solution)) {
+			System.out.println(solution.size());
+			//System.out.println("Assegnamento riuscito"+", all'impiegato: "+task_A.getEmployee().getUserName());
+			for (Map.Entry<Task, Employee> entry : solution.entrySet()) {
+				System.out.println("Task : " + entry.getKey().getDescription() + " Employee : " + entry.getValue().getUserName());
+				Employee oldEmployee = entry.getKey().getEmployee();
+				if (oldEmployee != null)
+					oldEmployee.getTasks().remove(entry.getKey());
+				entry.getValue().getTasks().add(entry.getKey());
+				entry.getKey().setEmployee(entry.getValue());
+			}
+		}
 		else System.out.println("Assegnamento fallito");
 		printEmployeeScheduling(luca, days_max, start, end);
 		printEmployeeScheduling(katia, days_max, start, end);	
+	
 		
 	}
 
 	public static void testNegativo() {
-		System.out.println("Test Negativo: ");
-		Team team1 = new Team("Team1");
-		Employee A = new Employee();
-		A.setUserName("A");
-		Employee B = new Employee();
-		B.setUserName("B");
-		Employee C = new Employee();
-		C.setUserName("C");
-		Employee D = new Employee();
-		D.setUserName("D");
-		
-		team1.getEmployees().add(A);
-		team1.getEmployees().add(B);
-		team1.getEmployees().add(C);
-		team1.getEmployees().add(D);
-		
-		LocalDate start = LocalDate.parse("2019-12-16");
-		LocalDate end =  LocalDate.parse("2019-12-22");
-		long days_max = ChronoUnit.DAYS.between(start, end)+1;
-		
-		Task task_A = new Task("TASK A", LocalDate.parse("2019-12-19"), null, LocalDate.parse("2019-12-22"), null);
-		Task task_B = new Task("TASK B", LocalDate.parse("2019-12-16"), null, LocalDate.parse("2019-12-20"), null);
-		Task task_C = new Task("TASK C", LocalDate.parse("2019-12-18"), null, LocalDate.parse("2019-12-20"), null);
-		Task task_D = new Task("TASK D", LocalDate.parse("2019-12-18"), null, LocalDate.parse("2019-12-18"), null);
-		Task task_E = new Task("TASK E", LocalDate.parse("2019-12-20"), null, LocalDate.parse("2019-12-22"), null);
-		Task task_F = new Task("TASK F", LocalDate.parse("2019-12-17"), null, LocalDate.parse("2019-12-18"), null);
-		Task task_G = new Task("TASK G", LocalDate.parse("2019-12-19"), null, LocalDate.parse("2019-12-20"), null);
-		
-		A.getTasks().add(task_B);
-		task_B.setEmployee(A);
-		
-		B.getTasks().add(task_C);
-		task_C.setEmployee(B);
-		
-		C.getTasks().add(task_D);
-		task_D.setEmployee(C);
-		
-		C.getTasks().add(task_E);
-		task_E.setEmployee(C);
-		
-		D.getTasks().add(task_F);
-		task_F.setEmployee(D);
-		
-		D.getTasks().add(task_G);
-		task_G.setEmployee(D);
-		
-		System.out.println("Prima");
-		
-		for(Employee e: team1.getEmployees()) {
-			printEmployeeScheduling(e, days_max, start, end);
-		}
-		
-		System.out.print("Provo ad assegnare TASK_A: ");
-		printTaskSchedule(task_A, start, end);
-		
-		List<Task> visti = new ArrayList<>();
-		if(assignTaskToTeam(task_A, team1.getEmployees(), visti))
-			System.out.println("Assegnamento riuscito"+", All'impiegato: "+task_A.getEmployee().getUserName());
-		else System.out.println("Assegnamento fallito");
-		
-		System.out.println("Dopo");
-		
-		for(Employee e: team1.getEmployees()) {
-			printEmployeeScheduling(e, days_max, start, end);
-		}
-		
+//		System.out.println("Test Negativo: ");
+//		Team team1 = new Team("Team1");
+//		Employee A = new Employee();
+//		A.setUserName("A");
+//		Employee B = new Employee();
+//		B.setUserName("B");
+//		Employee C = new Employee();
+//		C.setUserName("C");
+//		Employee D = new Employee();
+//		D.setUserName("D");
+//		
+//		team1.getEmployees().add(A);
+//		team1.getEmployees().add(B);
+//		team1.getEmployees().add(C);
+//		team1.getEmployees().add(D);
+//		
+//		LocalDate start = LocalDate.parse("2019-12-16");
+//		LocalDate end =  LocalDate.parse("2019-12-22");
+//		long days_max = ChronoUnit.DAYS.between(start, end)+1;
+//		
+//		Task task_A = new Task("TASK A", LocalDate.parse("2019-12-19"), null, LocalDate.parse("2019-12-22"), null);
+//		Task task_B = new Task("TASK B", LocalDate.parse("2019-12-16"), null, LocalDate.parse("2019-12-20"), null);
+//		Task task_C = new Task("TASK C", LocalDate.parse("2019-12-18"), null, LocalDate.parse("2019-12-20"), null);
+//		Task task_D = new Task("TASK D", LocalDate.parse("2019-12-18"), null, LocalDate.parse("2019-12-18"), null);
+//		Task task_E = new Task("TASK E", LocalDate.parse("2019-12-20"), null, LocalDate.parse("2019-12-22"), null);
+//		Task task_F = new Task("TASK F", LocalDate.parse("2019-12-17"), null, LocalDate.parse("2019-12-18"), null);
+//		Task task_G = new Task("TASK G", LocalDate.parse("2019-12-19"), null, LocalDate.parse("2019-12-20"), null);
+//		
+//		A.getTasks().add(task_B);
+//		task_B.setEmployee(A);
+//		
+//		B.getTasks().add(task_C);
+//		task_C.setEmployee(B);
+//		
+//		C.getTasks().add(task_D);
+//		task_D.setEmployee(C);
+//		
+//		C.getTasks().add(task_E);
+//		task_E.setEmployee(C);
+//		
+//		D.getTasks().add(task_F);
+//		task_F.setEmployee(D);
+//		
+//		D.getTasks().add(task_G);
+//		task_G.setEmployee(D);
+//		
+//		System.out.println("Prima");
+//		
+//		for(Employee e: team1.getEmployees()) {
+//			printEmployeeScheduling(e, days_max, start, end);
+//		}
+//		
+//		System.out.print("Provo ad assegnare TASK_A: ");
+//		printTaskSchedule(task_A, start, end);
+//		
+//		List<Task> visti = new ArrayList<>();
+//		if(assignTaskToTeam(task_A, team1.getEmployees(), visti))
+//			System.out.println("Assegnamento riuscito"+", All'impiegato: "+task_A.getEmployee().getUserName());
+//		else System.out.println("Assegnamento fallito");
+//		
+//		System.out.println("Dopo");
+//		
+//		for(Employee e: team1.getEmployees()) {
+//			printEmployeeScheduling(e, days_max, start, end);
+//		}
+//		
 	}
 
-	private static boolean assignTaskToTeam(Task task, List<Employee> team, List<Task> visti) {
+	private static boolean assignTaskToTeam(Task task, List<Employee> team, List<Task> visti, Map<Task, Employee> solution ) {
 
 		// caso base negativo
 		if (visti.contains(task)) {
@@ -150,11 +167,14 @@ public class AssignTaskToTeam {
 		for (Employee employee : team) {
 			if (employee != task.getEmployee()) {
 				if (employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime())) {
-					Employee oldEmployee = task.getEmployee();
-					if (oldEmployee != null)
-						oldEmployee.getTasks().remove(task);
-					employee.getTasks().add(task);
-					task.setEmployee(employee);
+					
+//					Employee oldEmployee = task.getEmployee();
+//					if (oldEmployee != null)
+//						oldEmployee.getTasks().remove(task);
+//					employee.getTasks().add(task);
+//					task.setEmployee(employee);
+					solution.put(task, employee);
+					
 					return true;
 				}
 			}
@@ -169,23 +189,52 @@ public class AssignTaskToTeam {
 
 				List<Task> tasks_in_period = getTasksInPeriod(employee, task.getExpectedStartTime(),
 						task.getExpectedEndTime());
-
-				if (tasks_in_period.size() == 1) { // se ci sono più task da spostare per ora non considero
-													// quell'impiegato
-
-					Task task_to_rearrange = tasks_in_period.get(0);
-
-					// if(!taskInProgress(task_to_rearrange)) {
-					if (assignTaskToTeam(task_to_rearrange, team, visti)) {
-						Employee oldEmployee = task.getEmployee();
-						if (oldEmployee != null)
-							oldEmployee.getTasks().remove(task);
-						employee.getTasks().add(task);
-						task.setEmployee(employee);
-						return true;
+				
+				int result = 1;
+				Map <Task, Employee> partialSolution = new HashMap<Task, Employee>();
+				for(Task task_to_rearrange: tasks_in_period) {
+					if (!assignTaskToTeam(task_to_rearrange, team, visti, partialSolution)) {
+						
+						result= -result;
+					break;	
 					}
-					// }
+					
+					
 				}
+				
+				if(result > 0) 
+				{
+					//copy
+					for (Map.Entry<Task, Employee> entry : partialSolution.entrySet()) {
+						solution.put(entry.getKey(), entry.getValue());
+					}
+					
+					solution.put(task, employee);
+					return true;
+				}
+					
+//				
+//
+//				if (tasks_in_period.size() == 1) { // se ci sono più task da spostare per ora non considero
+//													// quell'impiegato
+//
+//					Task task_to_rearrange = tasks_in_period.get(0);
+//
+//					// if(!taskInProgress(task_to_rearrange)) {
+//					if (assignTaskToTeam(task_to_rearrange, team, visti, solution)) {
+//						
+////						Employee oldEmployee = task.getEmployee();
+////						if (oldEmployee != null)
+////							oldEmployee.getTasks().remove(task);
+////						employee.getTasks().add(task);
+////						task.setEmployee(employee);
+//						
+//						solution.put(task, employee);
+//						
+//						return true;
+//					}
+					// }
+//				}
 
 			}
 		}
