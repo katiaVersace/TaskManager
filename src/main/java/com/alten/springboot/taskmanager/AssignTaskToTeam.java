@@ -162,9 +162,8 @@ private static void printEmployeeScheduling(Employee employee, long schedule_siz
 			//System.out.println("Task start "+t.getExpectedStartTime()+" , End: "+t.getExpectedEndTime());
 			long diff1 = ChronoUnit.DAYS.between(start, task.getExpectedStartTime());
 			long task_duration = ChronoUnit.DAYS.between(task.getExpectedStartTime(), task.getExpectedEndTime())+1;
-			long diff2 = ChronoUnit.DAYS.between(task.getExpectedEndTime(), end);
-			
-			//System.out.println("diff1: "+diff1+", task_dur: "+task_duration+", diff2 "+diff2);
+
+			//System.out.println("diff1: "+diff1+", task_dur: "+task_duration);
 			
 			//System.out.println(task);
 

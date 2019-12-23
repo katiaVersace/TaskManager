@@ -1,10 +1,10 @@
-package com.alten.springboot.taskmanager.service;
+package com.alten.springboot.taskmanager.business_service;
 
 import java.util.List;
 
 import com.alten.springboot.taskmanager.dto.TaskDto;
 
-public interface TaskService {
+public interface TaskBusinessService {
 	
 	public List<TaskDto> findAll();
 	

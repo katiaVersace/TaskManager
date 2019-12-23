@@ -7,20 +7,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import com.alten.springboot.taskmanager.data_service.EmployeeDataService;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
-import com.alten.springboot.taskmanager.service.EmployeeService;
 
 
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     @Autowired
-    private EmployeeService employeeService;
+    private EmployeeDataService employeeService;
+    
+    @Autowired
+	private ModelMapper modelMapper;
 	
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -31,8 +35,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 		String userName = authentication.getName();
 		
 		//System.out.println("userName=" + userName);
-
-		EmployeeDto theUser = employeeService.findByUserName(userName);
+		
+		EmployeeDto theUser = modelMapper.map(employeeService.findByUserName(userName), EmployeeDto.class);
 		
 		// now place in the session
 		HttpSession session = request.getSession();

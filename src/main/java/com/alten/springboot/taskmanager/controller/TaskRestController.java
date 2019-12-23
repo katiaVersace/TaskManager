@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.alten.springboot.taskmanager.business_service.TaskBusinessService;
 import com.alten.springboot.taskmanager.dto.TaskDto;
-import com.alten.springboot.taskmanager.service.TaskService;
 
 
 
@@ -17,7 +17,7 @@ import com.alten.springboot.taskmanager.service.TaskService;
 public class TaskRestController implements ITaskRestController{
 
 	@Autowired
-	private TaskService taskService;
+	private TaskBusinessService taskService;
 
 	@Override
 	public List<TaskDto> getTasks() {

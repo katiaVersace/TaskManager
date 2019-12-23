@@ -38,9 +38,7 @@ public class Task {
 	private String description;
 
 	
-	@ManyToOne(cascade= {CascadeType.PERSIST, CascadeType.MERGE,
-			 CascadeType.DETACH, CascadeType.REFRESH})
-	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+	@ManyToOne
 	@JoinColumn(name="employee_id")
 	private Employee employee;
 	

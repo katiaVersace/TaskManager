@@ -5,6 +5,7 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Context;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,17 +15,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Component;
 
+import com.alten.springboot.taskmanager.data_service.EmployeeDataService;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
-import com.alten.springboot.taskmanager.service.EmployeeService;
 
 @Component
 public class LoginController implements ILoginController {
 	
 	@Autowired
-	private EmployeeService employeeService;
+	private EmployeeDataService employeeService;
 	
 	@Autowired
 	private AuthenticationManager authManager;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 	
 	private @Context  HttpServletRequest request;
 	
@@ -39,12 +43,12 @@ public class LoginController implements ILoginController {
 			sc.setAuthentication(auth);
 			HttpSession session = request.getSession(true);
 
-			EmployeeDto theUser = employeeService.findByUserName(username);
+			EmployeeDto theUser = modelMapper.map(employeeService.findByUserName(username), EmployeeDto.class);
 
 			session.setAttribute("user", theUser);
 			session.setAttribute("SPRING_SECURITY_CONTEXT", sc);
 
-			return employeeService.findByUserName(username);
+			return theUser;
 		} catch (Exception ex) {
 			return null;
 		}

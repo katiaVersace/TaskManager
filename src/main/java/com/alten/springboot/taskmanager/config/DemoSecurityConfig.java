@@ -15,7 +15,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
-import com.alten.springboot.taskmanager.service.EmployeeService;
+import com.alten.springboot.taskmanager.data_service.EmployeeDataService;
 
 @Configuration
 @EnableWebSecurity
@@ -24,7 +24,7 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	// add a reference to our security data source
 	@Autowired
-	private EmployeeService employeeService;
+	private EmployeeDataService employeeService;
 
 	@Autowired
 	private CustomAccessDeniedHandler accessDeniedHandler;

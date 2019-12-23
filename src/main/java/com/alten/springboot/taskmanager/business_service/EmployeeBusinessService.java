@@ -1,4 +1,4 @@
-package com.alten.springboot.taskmanager.service;
+package com.alten.springboot.taskmanager.business_service;
 
 
 
@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
 
-public interface EmployeeService extends UserDetailsService 
+public interface EmployeeBusinessService 
 {
 
     EmployeeDto findByUserName(String userName);

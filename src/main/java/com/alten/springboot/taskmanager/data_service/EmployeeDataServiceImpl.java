@@ -1,4 +1,4 @@
-package com.alten.springboot.taskmanager.service;
+package com.alten.springboot.taskmanager.data_service;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,13 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alten.springboot.taskmanager.config.PrincipalUser;
 import com.alten.springboot.taskmanager.dao.EmployeeRepository;
 import com.alten.springboot.taskmanager.dao.RoleRepository;
-import com.alten.springboot.taskmanager.dto.EmployeeDto;
 import com.alten.springboot.taskmanager.entity.Employee;
 import com.alten.springboot.taskmanager.entity.Role;
-import com.alten.springboot.taskmanager.entity.Task;
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService {
+public class EmployeeDataServiceImpl implements EmployeeDataService {
 
 	@Autowired
 	private EmployeeRepository employeeDao;
@@ -32,19 +29,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Autowired
 	private RoleRepository roleDao;
 
-	@Autowired
-	private ModelMapper modelMapper;
-
 	@Override
 	@Transactional
-	public EmployeeDto findByUserName(String userName) {
+	public Employee findByUserName(String userName) {
 
 		Employee employee = employeeDao.findByUserName(userName);
-		EmployeeDto EmployeeDtoLight = null;
-		if (employee != null) {
-			EmployeeDtoLight = modelMapper.map(employee, EmployeeDto.class);
-		}
-		return EmployeeDtoLight;
+		return employee;
 
 	}
 
@@ -66,51 +56,41 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	@Transactional
-	public List<EmployeeDto> findAll() {
+	public List<Employee> findAll() {
 		List<Employee> employees = employeeDao.findAll();
-		List<EmployeeDto> employeesDto = new ArrayList<EmployeeDto>();
-		for (Employee employee : employees) {
-			employeesDto.add(modelMapper.map(employee, EmployeeDto.class));
-		}
-		return employeesDto;
+
+		return employees;
 	}
 
 	@Override
 	@Transactional
-	public EmployeeDto findById(int employeeId) {
+	public Employee findById(int employeeId) {
 		Optional<Employee> result = employeeDao.findById(employeeId);
 
-		EmployeeDto EmployeeDtoLight = null;
-		if (result.isPresent()) {
-
-			EmployeeDtoLight = modelMapper.map(result.get(), EmployeeDto.class);
-		}
-
-		return EmployeeDtoLight;
+		return result.get();
 
 	}
 
 	@Override
 	@Transactional
-	public void save(EmployeeDto employeeDtoLight) {
-		Employee employee = modelMapper.map(employeeDtoLight, Employee.class);
+	public void save(Employee employee) {
 		List<Role> roles = new ArrayList<Role>();
 		for (Role r : employee.getRoles()) {
 			roles.add(roleDao.findById(r.getId()).get());
 		}
 		employee.setRoles(roles);
+
 		employeeDao.save(employee);
 
 	}
 
 	@Override
 	@Transactional
-	public boolean update(EmployeeDto employeeDtoLight) {
-		Optional<Employee> result = employeeDao.findById(employeeDtoLight.getId());
+	public boolean update(Employee newEmployee) {
+		Optional<Employee> result = employeeDao.findById(newEmployee.getId());
 
 		if (result.isPresent()) {
 			Employee oldEmployee = result.get();
-			Employee newEmployee = modelMapper.map(employeeDtoLight, Employee.class);
 
 			// update only if you have the last version
 			int oldVersion = oldEmployee.getVersion();
@@ -126,8 +106,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 				oldEmployee.getRoles().clear();
 				oldEmployee.getRoles().addAll(newEmployee.getRoles());
 
-//				oldEmployee.getTasks().clear();
-//				oldEmployee.getTasks().addAll(newEmployee.getTasks());
+				oldEmployee.getTasks().clear();
+				oldEmployee.getTasks().addAll(newEmployee.getTasks());
+				
+				
 
 				employeeDao.save(oldEmployee);
 				return true;
@@ -147,17 +129,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	@Transactional
 	public void delete(int employeeId) {
-		Employee theEmployee = employeeDao.findById(employeeId).get();
 
-		if (theEmployee != null) {
+		employeeDao.deleteById(employeeId);
 
-			for (Task t : theEmployee.getTasks()) {
-				t.setEmployee(null);
-			}
-			employeeDao.deleteById(employeeId);
-		}
 	}
-
-	
 
 }
