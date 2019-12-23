@@ -68,6 +68,8 @@ private static boolean assignTaskToTeam(Task task, List<Employee> team, List<Tas
 	for(Employee employee: team) {
 		if(employee != task.getEmployee()) {
 			if(employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime())) {
+				Employee oldEmployee = task.getEmployee();
+				if(oldEmployee != null) oldEmployee.getTasks().remove(task);
 				employee.getTasks().add(task);
 				task.setEmployee(employee);
 				return true;
@@ -91,6 +93,8 @@ private static boolean assignTaskToTeam(Task task, List<Employee> team, List<Tas
 			//if(!taskInProgress(task_to_rearrange)) { 
 				if(assignTaskToTeam(task_to_rearrange, team, visti))
 				{
+					Employee oldEmployee = task.getEmployee();
+					if(oldEmployee != null) oldEmployee.getTasks().remove(task);
 					employee.getTasks().add(task);
 					task.setEmployee(employee);
 					return true;
@@ -150,6 +154,7 @@ public static boolean employeeAvailable(Employee e, LocalDate startTask, LocalDa
 
 private static void printEmployeeScheduling(Employee employee, long schedule_size, LocalDate start, LocalDate end) {
 		
+	//System.out.println(employee);
 		Boolean[] schedule = new Boolean[(int) schedule_size];
 		Arrays.fill(schedule, Boolean.FALSE);
 		
@@ -161,7 +166,7 @@ private static void printEmployeeScheduling(Employee employee, long schedule_siz
 			
 			//System.out.println("diff1: "+diff1+", task_dur: "+task_duration+", diff2 "+diff2);
 			
-			
+			//System.out.println(task);
 
 			for (int i = (int) diff1; i < diff1+task_duration; i++) {
 				schedule[i] = true;
