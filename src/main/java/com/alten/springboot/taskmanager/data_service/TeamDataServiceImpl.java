@@ -31,7 +31,6 @@ public class TeamDataServiceImpl implements TeamDataService {
 	@Transactional
 	public Team findById(int teamId) {
 		Optional<Team> result = teamDao.findById(teamId);
-
 		
 		return result.get();
 	}

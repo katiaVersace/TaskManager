@@ -2,10 +2,14 @@ package com.alten.springboot.taskmanager.controller;
 
 import java.util.List;
 
+import javax.ws.rs.FormParam;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alten.springboot.taskmanager.business_service.TeamBusinessService;
+import com.alten.springboot.taskmanager.dto.AssignTaskToTeamInputDto;
+import com.alten.springboot.taskmanager.dto.RandomPopulationInputDto;
 import com.alten.springboot.taskmanager.dto.TeamDto;
 
 @Component
@@ -45,9 +49,18 @@ public class TeamController implements ITeamController{
 		return "Deleted team with id: "+teamId;
 	}
 
-//	@Override
-//	public void populateDatabase() {
-//		teamService.populateDB();
-//	}
+	@Override
+	public String randomPopulation(RandomPopulationInputDto input) {
+		
+		return teamService.randomPopulation(input.getStart(), input.getEnd(), input.getTeams_size(), input.getEmployees_size(), input.getTasks_size(), input.getTask_max_duration());
+		
+	}
+
+	@Override
+	public boolean assignTaskToTeam(AssignTaskToTeamInputDto input) {
+		return teamService.tryAssignTaskToTeam(input.getStart(), input.getEnd(), input.getTeam_id(), input.getTask());
+	}
+
+
 
 }

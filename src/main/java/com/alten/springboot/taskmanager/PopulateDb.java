@@ -1,15 +1,16 @@
 package com.alten.springboot.taskmanager;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
 import org.apache.commons.lang3.RandomStringUtils;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+
 import com.alten.springboot.taskmanager.entity.Employee;
 import com.alten.springboot.taskmanager.entity.Task;
 import com.alten.springboot.taskmanager.entity.Team;

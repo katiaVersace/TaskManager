@@ -302,12 +302,29 @@ public class AssignTaskToTeam {
 		for (Task task : employee.getTasks()) {
 			// System.out.println("Task start "+t.getExpectedStartTime()+" , End:
 			// "+t.getExpectedEndTime());
-			long diff1 = ChronoUnit.DAYS.between(start, task.getExpectedStartTime());
-			long task_duration = ChronoUnit.DAYS.between(task.getExpectedStartTime(), task.getExpectedEndTime()) + 1;
+			
+			LocalDate taskStartDate = task.getExpectedStartTime();
+			LocalDate taskEndDate = task.getExpectedEndTime();
+
+			// check on task start and end because a task can end over the end of the period
+			// specified or start before
+			if (taskStartDate.isBefore(start)) {
+				taskStartDate = start;
+			}
+			if (taskEndDate.isAfter(end)) {
+				taskEndDate = end;
+			}
+
+			long diff1 = ChronoUnit.DAYS.between(start, taskStartDate);
+			long task_duration = ChronoUnit.DAYS.between(taskStartDate, taskEndDate) + 1;
+			
+			
 
 			// System.out.println("diff1: "+diff1+", task_dur: "+task_duration);
 
 			// System.out.println(task);
+			
+			
 
 			for (int i = (int) diff1; i < diff1 + task_duration; i++) {
 				schedule[i] = true;

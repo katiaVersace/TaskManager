@@ -4,9 +4,9 @@ package com.alten.springboot.taskmanager.business_service;
 
 import java.util.List;
 
-import org.springframework.security.core.userdetails.UserDetailsService;
-
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
+import com.alten.springboot.taskmanager.dto.TaskDto;
+import com.alten.springboot.taskmanager.dto.TeamDto;
 
 public interface EmployeeBusinessService 
 {
@@ -22,6 +22,10 @@ public interface EmployeeBusinessService
     boolean update(EmployeeDto employee);
     
     void delete(int employeeId);
+
+	List<EmployeeDto> getAvailableEmployeesByTeamAndTask(int teamId, TaskDto theTask);
+
+	String getAvailabilityByEmployee(int employeeId, String start, String end);
     
   
    

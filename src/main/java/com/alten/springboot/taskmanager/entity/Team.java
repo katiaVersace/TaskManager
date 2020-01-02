@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 
 @Entity
@@ -31,7 +32,7 @@ public class Team {
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "employees_teams", 
     joinColumns = { @JoinColumn(name = "team_id") }, 
-    inverseJoinColumns = { @JoinColumn(name = "employee_id") })
+    inverseJoinColumns = { @JoinColumn(name = "employee_id") }, uniqueConstraints =   @UniqueConstraint(columnNames = {"team_id", "employee_id"}))
 	private List<Employee> employees;
 	
 	@Column(name = "version", nullable = false)

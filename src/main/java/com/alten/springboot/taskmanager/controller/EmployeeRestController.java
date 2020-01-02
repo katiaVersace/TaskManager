@@ -13,7 +13,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.alten.springboot.taskmanager.business_service.EmployeeBusinessService;
+import com.alten.springboot.taskmanager.dto.AvailabilityByEmployeeInputDto;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
+import com.alten.springboot.taskmanager.dto.TaskDto;
+import com.alten.springboot.taskmanager.dto.TeamDto;
 
 
 @Component
@@ -76,6 +79,18 @@ public class EmployeeRestController implements IEmployeeRestController {
 			return "Deleted employee with id: " + employeeId;
 
 	}
+
+	@Override
+	public List<EmployeeDto> getAvailableEmployeesByTeamAndTask(int teamId, TaskDto theTask) {
+		return employeeService.getAvailableEmployeesByTeamAndTask(teamId, theTask);
+		
+	}
+
+	@Override
+	public String getAvailabilityByEmployee(AvailabilityByEmployeeInputDto input) {
+		return employeeService.getAvailabilityByEmployee(input.getEmployee_id(), input.getStart(), input.getEnd());
+	}
+
 
 	
 

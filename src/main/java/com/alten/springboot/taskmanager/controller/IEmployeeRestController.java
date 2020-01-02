@@ -2,24 +2,23 @@ package com.alten.springboot.taskmanager.controller;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.alten.springboot.taskmanager.dto.AvailabilityByEmployeeInputDto;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
+import com.alten.springboot.taskmanager.dto.TaskDto;
+import com.alten.springboot.taskmanager.dto.TeamDto;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -73,7 +72,19 @@ public interface IEmployeeRestController {
 	public String deleteEmployee(
 			@ApiParam(value = "Employee Id from which employee object will delete from database table", required = true) @PathParam("employeeId") String employeeId);
 
-	 
+	@ApiOperation(value = "View a list of available employees in a Team for a Task", response = List.class)
+	@GET
+	@Path("/employeesByTeamAndTask/{teamId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<EmployeeDto> getAvailableEmployeesByTeamAndTask(@ApiParam(value = "Team id object store in database table", required = true) @PathParam("teamId") int teamId,
+			@ApiParam(value = "Task object store in database table", required = true) TaskDto theTask);
+	
+	
+	@ApiOperation(value = "View availability and tasks for an Employee", response = List.class)
+	@GET
+	@Path("/availability")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getAvailabilityByEmployee(@ApiParam(value = "input", required = true)  AvailabilityByEmployeeInputDto input);
 
 
 }
