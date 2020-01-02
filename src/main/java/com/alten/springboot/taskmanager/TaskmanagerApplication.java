@@ -1,6 +1,13 @@
 package com.alten.springboot.taskmanager;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+import org.modelmapper.AbstractConverter;
+import org.modelmapper.AbstractProvider;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.Provider;
 import org.modelmapper.TypeMap;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
@@ -37,12 +44,43 @@ public class TaskmanagerApplication extends SpringBootServletInitializer {
 	public ModelMapper modelMapper() {
 		ModelMapper modelMapper = new ModelMapper();
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-		TypeMap<Task, TaskDto> typeMap = modelMapper.createTypeMap(Task.class, TaskDto.class);
+		TypeMap<Task, TaskDto> typeMapToDto = modelMapper.createTypeMap(Task.class, TaskDto.class);
 
-		typeMap.addMappings(mapper -> {
+		typeMapToDto.addMappings(mapper -> {
 			mapper.map(src -> src.getEmployee().getId(), TaskDto::setEmployeeId);
 
 		});
+		
+	    Provider<LocalDate> localDateProvider = new AbstractProvider<LocalDate>() {
+	        @Override
+	        public LocalDate get() {
+	        	LocalDate now= LocalDate.now();
+	        	return now;
+	        }
+	    };
+
+	    Converter<String, LocalDate> toDate = new AbstractConverter<String, LocalDate>() {
+	        @Override
+	        protected LocalDate convert(String source) {
+	        	
+	            DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	            LocalDate localDate = LocalDate.parse(source, format);
+	            return localDate;
+	        }
+	    };
+
+
+	    modelMapper.createTypeMap(String.class, LocalDate.class);
+	   
+	    modelMapper.addConverter(toDate);
+	  
+	    modelMapper.getTypeMap(String.class, LocalDate.class).setProvider(localDateProvider);
+	  
+		
+		
+		
+		
+		
 
 
 		return modelMapper;

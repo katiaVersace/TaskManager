@@ -63,6 +63,7 @@ public class TaskRestController implements ITaskRestController{
 	public TaskDto updateTask(
 			@RequestBody TaskDto theTask) {
 		TaskDto oldTask = taskService.findById(theTask.getId());
+		
 
 		if (theTask.getRealStartTime() != null) {
 			oldTask.setRealStartTime(theTask.getRealStartTime());

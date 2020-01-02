@@ -94,8 +94,8 @@ public class EmployeeBusinessServiceImpl implements EmployeeBusinessService {
 			
 			
 
-			if (employeeAvailable(employee.getTasks(), theTask.getExpectedStartTime(),
-					theTask.getExpectedEndTime())) {
+			if (employeeAvailable(employee.getTasks(), LocalDate.parse(theTask.getExpectedStartTime()),
+					LocalDate.parse(theTask.getExpectedEndTime()))) {
 				result.add(modelMapper.map(employee, EmployeeDto.class));
 			}
 		}

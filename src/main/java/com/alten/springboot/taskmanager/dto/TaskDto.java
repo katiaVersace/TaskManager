@@ -1,20 +1,13 @@
 package com.alten.springboot.taskmanager.dto;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "All details about the Task. ")
-public class TaskDto implements Serializable{
-	
+public class TaskDto implements Serializable {
+
 	@ApiModelProperty(notes = "The database generated task ID")
 	private int id;
 
@@ -23,31 +16,19 @@ public class TaskDto implements Serializable{
 
 	@ApiModelProperty(notes = "The employee associated with the task")
 	private int employeeId;
-	
+
 	@ApiModelProperty(notes = "The task Expected Start Time")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd",timezone="CET")
-	@JsonDeserialize(using = LocalDateDeserializer.class)
-	@JsonSerialize(using = LocalDateSerializer.class)
-	private LocalDate expectedStartTime;
-	
+	private String expectedStartTime;
+
 	@ApiModelProperty(notes = "The task Real Start Time")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd",timezone="CET")
-	@JsonDeserialize(using = LocalDateDeserializer.class)
-	@JsonSerialize(using = LocalDateSerializer.class)
-	private LocalDate realStartTime;
-	
+	private String realStartTime;
+
 	@ApiModelProperty(notes = "The task Expected End Time")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd",timezone="CET")
-	@JsonDeserialize(using = LocalDateDeserializer.class)
-	@JsonSerialize(using = LocalDateSerializer.class)
-	private LocalDate expectedEndTime;
-	
+	private String expectedEndTime;
+
 	@ApiModelProperty(notes = "The task Real End Time")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd",timezone="CET")
-	@JsonDeserialize(using = LocalDateDeserializer.class)
-	@JsonSerialize(using = LocalDateSerializer.class)
-	private LocalDate realEndTime;
-	
+	private String realEndTime;
+
 	@ApiModelProperty(notes = "The task version stored in the database")
 	private int version;
 
@@ -67,7 +48,6 @@ public class TaskDto implements Serializable{
 		this.description = description;
 	}
 
-	
 	public int getEmployeeId() {
 		return employeeId;
 	}
@@ -76,35 +56,35 @@ public class TaskDto implements Serializable{
 		this.employeeId = employeeId;
 	}
 
-	public LocalDate getExpectedStartTime() {
+	public String getExpectedStartTime() {
 		return expectedStartTime;
 	}
 
-	public void setExpectedStartTime(LocalDate expectedStartTime) {
+	public void setExpectedStartTime(String expectedStartTime) {
 		this.expectedStartTime = expectedStartTime;
 	}
 
-	public LocalDate getRealStartTime() {
+	public String getRealStartTime() {
 		return realStartTime;
 	}
 
-	public void setRealStartTime(LocalDate realStartTime) {
+	public void setRealStartTime(String realStartTime) {
 		this.realStartTime = realStartTime;
 	}
 
-	public LocalDate getExpectedEndTime() {
+	public String getExpectedEndTime() {
 		return expectedEndTime;
 	}
 
-	public void setExpectedEndTime(LocalDate expectedEndTime) {
+	public void setExpectedEndTime(String expectedEndTime) {
 		this.expectedEndTime = expectedEndTime;
 	}
 
-	public LocalDate getRealEndTime() {
+	public String getRealEndTime() {
 		return realEndTime;
 	}
 
-	public void setRealEndTime(LocalDate realEndTime) {
+	public void setRealEndTime(String realEndTime) {
 		this.realEndTime = realEndTime;
 	}
 
@@ -115,8 +95,5 @@ public class TaskDto implements Serializable{
 	public void setVersion(int version) {
 		this.version = version;
 	}
-
-	
-
 
 }

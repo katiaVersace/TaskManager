@@ -41,9 +41,9 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.csrf().disable().authorizeRequests().antMatchers("/resteasy/auth/login").permitAll()
-//		.antMatchers("/resteasy/employees/**").authenticated()
-//		.antMatchers("/resteasy/tasks/**").authenticated()
-//		.antMatchers("/resteasy/auth/**").authenticated()
+		.antMatchers("/resteasy/employees/**").authenticated()
+		.antMatchers("/resteasy/tasks/**").authenticated()
+		.antMatchers("/resteasy/auth/**").authenticated()
 		
 		.and().formLogin()
 				.successHandler(customAuthenticationSuccessHandler).permitAll().and().logout().deleteCookies("JSESSIONID")
