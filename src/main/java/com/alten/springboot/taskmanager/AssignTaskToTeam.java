@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.alten.springboot.taskmanager.entity.Employee;
 import com.alten.springboot.taskmanager.entity.Task;
@@ -156,7 +157,7 @@ public class AssignTaskToTeam {
 //		
 	}
 
-	private static boolean assignTaskToTeam(Task task, List<Employee> team, List<Task> visti, Map<Task, Employee> solution ) {
+	private static boolean assignTaskToTeam(Task task, Set<Employee> team, List<Task> visti, Map<Task, Employee> solution ) {
 
 		// caso base negativo
 		if (visti.contains(task)) {

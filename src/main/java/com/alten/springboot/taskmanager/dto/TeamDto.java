@@ -1,8 +1,8 @@
 package com.alten.springboot.taskmanager.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,7 +18,7 @@ public class TeamDto implements Serializable{
 	private String name;
 	
 	@ApiModelProperty(notes = "The employees of the team")
-	private List<EmployeeDto> employees;
+	private Set<EmployeeDto> employees;
 	
 	@ApiModelProperty(notes = "The team version stored in the database")
 	private int version;
@@ -48,13 +48,13 @@ public class TeamDto implements Serializable{
 		this.name = name;
 	}
 
-	public List<EmployeeDto> getEmployees() {
+	public Set<EmployeeDto> getEmployees() {
 		if(employees==null)
-			employees = new ArrayList<EmployeeDto>();
+			employees = new HashSet<EmployeeDto>();
 		return employees;
 	}
 
-	public void setEmployees(List<EmployeeDto> employees) {
+	public void setEmployees(Set<EmployeeDto> employees) {
 		this.employees = employees;
 	}
 	

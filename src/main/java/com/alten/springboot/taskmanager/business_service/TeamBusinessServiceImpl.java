@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
@@ -48,7 +49,7 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 	@Override
 	public TeamDto findById(int teamId) {
 		Team team = teamDataService.findById(teamId);
-
+		
 		TeamDto teamDto = null;
 		if (team != null) {
 
@@ -405,7 +406,7 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 		
 	}
 	
-	private boolean assignTaskToTeam(Task task, List<Employee> team, List<Task> visti, Map<Task, Employee> solution ) {
+	private boolean assignTaskToTeam(Task task, Set<Employee> team, List<Task> visti, Map<Task, Employee> solution ) {
 
 		// caso base negativo
 		if (visti.contains(task)) {

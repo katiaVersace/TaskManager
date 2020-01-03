@@ -1,7 +1,7 @@
 package com.alten.springboot.taskmanager.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,7 +33,7 @@ public class Team {
 	@JoinTable(name = "employees_teams", 
     joinColumns = { @JoinColumn(name = "team_id") }, 
     inverseJoinColumns = { @JoinColumn(name = "employee_id") }, uniqueConstraints =   @UniqueConstraint(columnNames = {"team_id", "employee_id"}))
-	private List<Employee> employees;
+	private Set<Employee> employees;
 	
 	@Column(name = "version", nullable = false)
 	private int version;
@@ -63,13 +63,13 @@ public class Team {
 		this.name = name;
 	}
 
-	public List<Employee> getEmployees() {
+	public Set<Employee> getEmployees() {
 		if(employees==null)
-			employees = new ArrayList<Employee>();
+			employees = new HashSet<Employee>();
 		return employees;
 	}
 
-	public void setEmployees(List<Employee> employees) {
+	public void setEmployees(Set<Employee> employees) {
 		this.employees = employees;
 	}
 	
