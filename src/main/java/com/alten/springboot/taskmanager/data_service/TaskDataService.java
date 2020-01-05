@@ -10,14 +10,14 @@ public interface TaskDataService {
 	
 	public Task findById(int taskId);
 	
-	public void save(Task task);
+	public Task save(Task task);
 	
-	public boolean update(Task task);
+	public Task update(Task task);
 	
 	public void delete(int taskId);
 
 	public  List<Task> findByEmployeeId(int employeeId);
 	
-	
+	public void deleteAll();
 
 }

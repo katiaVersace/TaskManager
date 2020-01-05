@@ -19,7 +19,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alten.springboot.taskmanager.data_service.EmployeeDataService;
+import com.alten.springboot.taskmanager.data_service.TaskDataService;
 import com.alten.springboot.taskmanager.data_service.TeamDataService;
+import com.alten.springboot.taskmanager.dto.EmployeeDto;
 import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.dto.TeamDto;
 import com.alten.springboot.taskmanager.entity.Employee;
@@ -31,6 +34,12 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 
 	@Autowired
 	private TeamDataService teamDataService;
+	
+	@Autowired
+	private EmployeeDataService employeeDataService;
+	
+	@Autowired
+	private TaskDataService taskDataService;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -69,7 +78,9 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 	@Override
 	public boolean update(TeamDto teamDto) {
 		Team newTeam = modelMapper.map(teamDto, Team.class);
-		return teamDataService.update(newTeam);
+		if( teamDataService.update(newTeam) != null)
+			return true;
+		else return false;
 	}
 
 	@Override
@@ -98,7 +109,6 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 				// Check input
 				long days_max = ChronoUnit.DAYS.between(start, end)+1;
 				if (teams_size > (employees_size / 2) || tasks_size < employees_size || task_max_duration >days_max ) {
-					System.out.println("invalid input");
 					return "invalid input";
 				}
 
@@ -111,9 +121,9 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 					String generatedString = RandomStringUtils.randomAlphabetic(nRandomChars).toUpperCase();
 					Employee employee = new Employee("EMP_" + generatedString, generatedString, "Name_" + generatedString,
 							"LastName_" + generatedString, generatedString + "@alten.it", false);
-					employee.setId(i + 1);
+					//employee.setId(i + 1);
+					employee = employeeDataService.save(employee);
 					employees.add(employee);
-
 					// System.out.println("Employees:\n" + employee);
 
 				}
@@ -124,9 +134,10 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 
 					String generatedString = RandomStringUtils.randomAlphabetic(nRandomChars).toUpperCase();
 					Team team = new Team("TEAM_" + generatedString);
-					team.setId(i + 1);
+					//team.setId(i + 1);
+					team = teamDataService.save(team);
 					teams.add(team);
-
+					
 					// System.out.println("Team:\n" + team);
 
 				}
@@ -134,7 +145,11 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 				// assign team to employees
 				int team_index = 0;
 				for (Employee employee : employees) {
-					teams.get(team_index).getEmployees().add(employee);
+					Team currentTeam = teams.get(team_index);
+					currentTeam.getEmployees().add(employee);
+					currentTeam = teamDataService.update(currentTeam);
+					teams.set(team_index, currentTeam);
+					
 					team_index++;
 					if (team_index == teams_size)
 						team_index = 0;
@@ -161,7 +176,7 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 
 					LocalDate expected_end_time = expectedStartTime.plusDays(duration - 1);
 					Task task = new Task("Task: " + generatedString, expectedStartTime, null, expected_end_time, null);
-					task.setId(i + 1);
+					//task.setId(i + 1);
 					tasks.add(task);
 					// System.out.println("Task \n" + task);
 
@@ -170,8 +185,16 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 				// assign at least 1 task for each employee
 				int task_index = 0;
 				for (Employee employee : employees) {
-					tasks.get(task_index).setEmployee(employee);
-					employee.getTasks().add(tasks.get(task_index));
+					Task currentTask = tasks.get(task_index);
+					currentTask.setEmployee(employee);
+					employee.getTasks().add(currentTask);
+					currentTask = taskDataService.save(currentTask);
+					tasks.set(task_index, currentTask);
+					if (employee.getTasks().size() >= 5) {
+
+						employee.setTopEmployee(true);
+						employee = employeeDataService.update(employee);
+					}
 					
 				//	System.out.println("Assigned "+ tasks.get(task_index).getDescription()+", to employee "+employee.getUserName()+", with start "+tasks.get(task_index).getExpectedStartTime());
 					task_index++;
@@ -192,20 +215,16 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 
 				}
 
-				for (Task t : tasks) {
-					if(t.getEmployee()!=null)
-					System.out.println(t);
-				}
+				
 				
 
-//				printOutput(start, end, tasks);
-//				System.out.println("\nAvailability: ");
 				String result ="";
 				for (Employee employee : employees) {
 					result = result.concat(printEmployeeScheduling(employee, days_max, start, end)+"\n");
 							
 				}
 				
+				System.out.println("RESULT: \n"+result);
 				return result;
 	}
 
@@ -221,12 +240,20 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 		
 		for (Task task : employee.getTasks()) {
 			//System.out.println("Task start "+t.getExpectedStartTime()+" , End: "+t.getExpectedEndTime());
-			long diff1 = ChronoUnit.DAYS.between(start, task.getExpectedStartTime());
-			long task_duration = ChronoUnit.DAYS.between(task.getExpectedStartTime(), task.getExpectedEndTime())+1;
-			long diff2 = ChronoUnit.DAYS.between(task.getExpectedEndTime(), end);
-			
-			//System.out.println("diff1: "+diff1+", task_dur: "+task_duration+", diff2 "+diff2);
-			
+			LocalDate taskStartDate = task.getExpectedStartTime();
+			LocalDate taskEndDate = task.getExpectedEndTime();
+
+			// check on task start and end because a task can end over the end of the period
+			// specified or start before
+			if (taskStartDate.isBefore(start)) {
+				taskStartDate = start;
+			}
+			if (taskEndDate.isAfter(end)) {
+				taskEndDate = end;
+			}
+
+			long diff1 = ChronoUnit.DAYS.between(start, taskStartDate);
+			long task_duration = ChronoUnit.DAYS.between(taskStartDate, taskEndDate) + 1;
 			
 
 			for (int i = (int) diff1; i < diff1+task_duration; i++) {
@@ -261,12 +288,6 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 					+ 1;
 					long diff2 = ChronoUnit.DAYS.between(t.getExpectedEndTime(), end);
 
-//			System.out.println("\ndiff1: "+diff1);
-//			System.out.println("task_duration: "+task_duration);
-
-//			System.out.println("diff2: "+diff2);
-//			System.out.println(end+ "\n"+ t.getExpectedEndTime());
-//			System.out.println(end.getTime()+ "\n"+ t.getExpectedEndTime().getTime());
 
 			for (int i = 0; i < diff1; i++) {
 				System.out.print("_ ");
@@ -295,6 +316,12 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 			if (employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime())) {
 				task.setEmployee(employee);
 				employee.getTasks().add(task);
+				task = taskDataService.save(task);
+				if (employee.getTasks().size() >= 5) {
+
+					employee.setTopEmployee(true);
+					employeeDataService.update(employee);
+				}
 				return true;
 			}
 		}
@@ -310,6 +337,12 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 
 				task.setEmployee(employee);
 				employee.getTasks().add(task);
+				task = taskDataService.save(task);
+				if (employee.getTasks().size() >= 5) {
+
+					employee.setTopEmployee(true);
+					employee = employeeDataService.update(employee);
+				}
 				return true;
 			}
 		}
@@ -370,7 +403,7 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 
 	
 	@Override
-	public boolean tryAssignTaskToTeam(String start_date, String end_date, int team_id, TaskDto theTaskDto) {
+	public TaskDto tryAssignTaskToTeam(String start_date, String end_date, int team_id, TaskDto theTaskDto) {
 		
 		Task theTask = modelMapper.map(theTaskDto, Task.class);
 		Team theTeam = teamDataService.findById(team_id);
@@ -382,25 +415,28 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 		List<Task> visti = new ArrayList<>();
 		Map<Task, Employee> solution = new HashMap<>();
 		if(assignTaskToTeam(theTask, theTeam.getEmployees(), visti, solution)) {
-			System.out.println(solution.size());
-			//System.out.println("Assegnamento riuscito"+", all'impiegato: "+task_A.getEmployee().getUserName());
 			for (Map.Entry<Task, Employee> entry : solution.entrySet()) {
 				System.out.println("Task : " + entry.getKey().getDescription() + " Employee : " + entry.getValue().getUserName());
 				Employee oldEmployee = entry.getKey().getEmployee();
-				if (oldEmployee != null)
+				if (oldEmployee != null) {
 					oldEmployee.getTasks().remove(entry.getKey());
+					oldEmployee = employeeDataService.update(oldEmployee);
+				}
 				entry.getValue().getTasks().add(entry.getKey());
 				entry.getKey().setEmployee(entry.getValue());
+				theTaskDto = modelMapper.map( taskDataService.save(entry.getKey()), TaskDto.class);
 			}
 			
 			for(Employee e: theTeam.getEmployees()) {
-			printEmployeeScheduling(e, days_max, start, end);
+			System.out.println(printEmployeeScheduling(e, days_max, start, end));
 			}
-		return true;
+			
+			
+		return theTaskDto;
 		}
 		else {
 			System.out.println("Assegnamento fallito");
-		return false;
+		return null;
 		}
 			
 		
@@ -521,6 +557,12 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 			
 		
 
+	}
+
+	@Override
+	public void deleteAll() {
+		teamDataService.deleteAll();
+		
 	}
 
 

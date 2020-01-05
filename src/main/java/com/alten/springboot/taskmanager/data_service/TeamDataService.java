@@ -7,13 +7,15 @@ import com.alten.springboot.taskmanager.entity.Team;
 public interface TeamDataService {
 	public List<Team> findAll();
 	
-	Team findById(int teamId);
+	public Team findById(int teamId);
     
-    void save(Team team);
+	public Team save(Team team);
     
-    boolean update(Team team);
+	public Team update(Team team);
     
-    void delete(int teamId);
+	public void delete(int teamId);
     
-    String populateDB();
+	public String populateDB();
+	
+	public void deleteAll();
 }

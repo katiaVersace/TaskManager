@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -16,14 +15,13 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-
-import com.alten.springboot.taskmanager.dto.AssignTaskToTeamInputDto;
 import com.alten.springboot.taskmanager.dto.RandomPopulationInputDto;
 import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.dto.TeamDto;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 @Api(value = "Team Management System", description = "Operations pertaining to teams")
 @Path("/teams")
@@ -79,11 +77,11 @@ public interface ITeamController {
 	@ApiOperation(value = "Assign Task to team with possibility to rearrange, allowed only to ADMIN employees", response = TaskDto.class)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@POST
-	@Path("/assignTaskToTeam")
+	@Path("/assignTaskToTeam/{teamId}")
 	@Consumes(MediaType.APPLICATION_JSON) 
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean assignTaskToTeam(
-			@ApiParam(value = "Input variables", required = true) AssignTaskToTeamInputDto input);
+	public TaskDto assignTaskToTeam(
+			@ApiParam(value = "Team Id", required = true) @PathParam("teamId") int teamId, @ApiParam(value = "Task to assign", required = true)TaskDto task);
 
 
 }

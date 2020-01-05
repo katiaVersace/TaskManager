@@ -58,7 +58,9 @@ public class TaskBusinessServiceImpl implements TaskBusinessService {
 	public boolean update(TaskDto taskDto) {
 		
 		Task task = modelMapper.map(taskDto, Task.class);
-		return taskDataService.update(task);
+		if( taskDataService.update(task) != null)
+			return true;
+		else return false;
 	}
 
 	@Override

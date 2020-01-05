@@ -72,7 +72,9 @@ public class EmployeeBusinessServiceImpl implements EmployeeBusinessService {
 	public boolean update(EmployeeDto employeeDto) {
 		Employee employee = modelMapper.map(employeeDto, Employee.class);
 
-		return employeeDataService.update(employee);
+		if(employeeDataService.update(employee) != null)
+			return true;
+		else return false;
 	}
 
 	@Override

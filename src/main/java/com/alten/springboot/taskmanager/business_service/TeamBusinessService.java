@@ -8,18 +8,20 @@ import com.alten.springboot.taskmanager.dto.TeamDto;
 public interface TeamBusinessService {
 	public List<TeamDto> findAll();
 	
-	TeamDto findById(int teamId);
+	public TeamDto findById(int teamId);
     
-    void save(TeamDto team);
+	public void save(TeamDto team);
     
-    boolean update(TeamDto team);
+    public boolean update(TeamDto team);
     
-    void delete(int teamId);
+    public void delete(int teamId);
     
-    String populateDB();
+    public String populateDB();
 
-	String randomPopulation(String start, String end, int teams_size, int employees_size, int tasks_size,
+    public String randomPopulation(String start, String end, int teams_size, int employees_size, int tasks_size,
 			int task_max_duration);
 
-	boolean tryAssignTaskToTeam(String start, String end, int team_id, TaskDto theTask);
+	public TaskDto tryAssignTaskToTeam(String start, String end, int team_id, TaskDto theTask);
+
+	public void deleteAll();
 }

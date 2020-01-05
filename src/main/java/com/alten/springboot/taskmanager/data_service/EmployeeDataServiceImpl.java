@@ -73,20 +73,20 @@ public class EmployeeDataServiceImpl implements EmployeeDataService {
 
 	@Override
 	@Transactional
-	public void save(Employee employee) {
+	public Employee save(Employee employee) {
 		List<Role> roles = new ArrayList<Role>();
 		for (Role r : employee.getRoles()) {
 			roles.add(roleDao.findById(r.getId()).get());
 		}
 		employee.setRoles(roles);
 
-		employeeDao.save(employee);
+		return employeeDao.save(employee);
 
 	}
 
 	@Override
 	@Transactional
-	public boolean update(Employee newEmployee) {
+	public Employee update(Employee newEmployee) {
 		Optional<Employee> result = employeeDao.findById(newEmployee.getId());
 
 		if (result.isPresent()) {
@@ -111,8 +111,8 @@ public class EmployeeDataServiceImpl implements EmployeeDataService {
 				
 				
 
-				employeeDao.save(oldEmployee);
-				return true;
+				return employeeDao.save(oldEmployee);
+				
 			}
 
 			else {

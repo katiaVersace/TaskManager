@@ -11,21 +11,21 @@ import com.alten.springboot.taskmanager.dto.TeamDto;
 public interface EmployeeBusinessService 
 {
 
-    EmployeeDto findByUserName(String userName);
+    public EmployeeDto findByUserName(String userName);
     
-    List<EmployeeDto> findAll();
+    public List<EmployeeDto> findAll();
 
-    EmployeeDto findById(int employeeId);
+    public EmployeeDto findById(int employeeId);
     
-    void save(EmployeeDto employee);
+    public void save(EmployeeDto employee);
     
-    boolean update(EmployeeDto employee);
+    public boolean update(EmployeeDto employee);
     
-    void delete(int employeeId);
+    public void delete(int employeeId);
 
-	List<EmployeeDto> getAvailableEmployeesByTeamAndTask(int teamId, TaskDto theTask);
+    public List<EmployeeDto> getAvailableEmployeesByTeamAndTask(int teamId, TaskDto theTask);
 
-	String getAvailabilityByEmployee(int employeeId, String start, String end);
+    public String getAvailabilityByEmployee(int employeeId, String start, String end);
     
   
    

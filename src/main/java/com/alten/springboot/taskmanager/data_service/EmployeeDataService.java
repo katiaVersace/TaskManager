@@ -17,9 +17,9 @@ public interface EmployeeDataService extends UserDetailsService
 
     Employee findById(int employeeId);
     
-    void save(Employee employee);
+    Employee save(Employee employee);
     
-    boolean update(Employee employee);
+    Employee update(Employee employee);
     
     void delete(int employeeId);
     

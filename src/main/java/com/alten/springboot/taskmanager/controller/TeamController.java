@@ -2,20 +2,18 @@ package com.alten.springboot.taskmanager.controller;
 
 import java.util.List;
 
-import javax.ws.rs.FormParam;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alten.springboot.taskmanager.business_service.TeamBusinessService;
-import com.alten.springboot.taskmanager.dto.AssignTaskToTeamInputDto;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
 import com.alten.springboot.taskmanager.dto.RandomPopulationInputDto;
+import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.dto.TeamDto;
 
 @Component
-public class TeamController implements ITeamController{
-	
+public class TeamController implements ITeamController {
+
 	@Autowired
 	private TeamBusinessService teamService;
 
@@ -27,7 +25,7 @@ public class TeamController implements ITeamController{
 	@Override
 	public TeamDto getTeam(int teamId) {
 		TeamDto team = teamService.findById(teamId);
-		
+
 		return team;
 	}
 
@@ -40,7 +38,7 @@ public class TeamController implements ITeamController{
 
 	@Override
 	public TeamDto updateTeam(TeamDto theTeam) {
-		
+
 		teamService.update(theTeam);
 		return theTeam;
 	}
@@ -48,21 +46,22 @@ public class TeamController implements ITeamController{
 	@Override
 	public String deleteTeam(int teamId) {
 		teamService.delete(teamId);
-		return "Deleted team with id: "+teamId;
+		return "Deleted team with id: " + teamId;
 	}
 
 	@Override
 	public String randomPopulation(RandomPopulationInputDto input) {
-		
-		return teamService.randomPopulation(input.getStart(), input.getEnd(), input.getTeams_size(), input.getEmployees_size(), input.getTasks_size(), input.getTask_max_duration());
+
+//		teamService.deleteAll();
+		return teamService.randomPopulation(input.getStart(), input.getEnd(), input.getTeams_size(),
+				input.getEmployees_size(), input.getTasks_size(), input.getTask_max_duration());
 		
 	}
 
 	@Override
-	public boolean assignTaskToTeam(AssignTaskToTeamInputDto input) {
-		return teamService.tryAssignTaskToTeam(input.getStart(), input.getEnd(), input.getTeam_id(), input.getTask());
+	public TaskDto assignTaskToTeam(int teamId, TaskDto task) {
+
+		return teamService.tryAssignTaskToTeam(task.getExpectedStartTime(), task.getExpectedEndTime(), teamId, task);
 	}
-
-
 
 }

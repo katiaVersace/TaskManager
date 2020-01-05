@@ -38,14 +38,14 @@ public class TeamDataServiceImpl implements TeamDataService {
 
 	@Override
 	@Transactional
-	public void save(Team team) {
-		teamDao.save(team);
+	public Team save(Team team) {
+		return teamDao.save(team);
 
 	}
 
 	@Override
 	@Transactional
-	public boolean update(Team newTeam) {
+	public Team update(Team newTeam) {
 		Optional<Team> result = teamDao.findById(newTeam.getId());
 
 		if (result.isPresent()) {
@@ -60,8 +60,8 @@ public class TeamDataServiceImpl implements TeamDataService {
 				oldTeam.getEmployees().clear();
 				oldTeam.getEmployees().addAll(newTeam.getEmployees());
 
-				teamDao.save(oldTeam);
-				return true;
+				return teamDao.save(oldTeam);
+				
 			}
 
 			else {
@@ -88,11 +88,17 @@ public class TeamDataServiceImpl implements TeamDataService {
 	}
 
 	@Override
+	@Transactional
 	public String populateDB() {
 		
 		return "ok";
 
 	}
 
+	@Override
+	@Transactional
+	public void deleteAll() {
+		teamDao.deleteAll();
+	}
 
 }
