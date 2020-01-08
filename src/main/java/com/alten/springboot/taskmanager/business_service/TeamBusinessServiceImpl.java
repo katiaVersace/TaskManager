@@ -410,6 +410,9 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 		
 		LocalDate start = LocalDate.parse(start_date);
 		LocalDate end =  LocalDate.parse(end_date);
+		
+		if(!checkDate(theTask)) return null;
+			
 		long days_max = ChronoUnit.DAYS.between(start, end)+1;
 		
 		List<Task> visti = new ArrayList<>();
@@ -442,6 +445,24 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 		
 	}
 	
+	public boolean checkDate(Task theTask) {
+		// check sulle date
+		LocalDate today = LocalDate.now();
+		if (!((theTask.getExpectedStartTime().isAfter(today) || theTask.getExpectedStartTime().equals(today))
+				&& (theTask.getExpectedStartTime().isBefore(theTask.getExpectedEndTime())
+						|| theTask.getExpectedStartTime().equals(theTask.getExpectedEndTime()))))
+			return false;
+
+		if (theTask.getRealStartTime() != null || theTask.getRealEndTime() != null) {
+			if (!((theTask.getRealStartTime().isAfter(today)
+					|| theTask.getRealStartTime().equals(today))
+					&& (theTask.getRealStartTime().isBefore(theTask.getRealEndTime())
+							|| theTask.getRealStartTime().equals(theTask.getRealEndTime()))))
+				return false;
+		}
+		return  true;
+	}
+
 	private boolean assignTaskToTeam(Task task, Set<Employee> team, List<Task> visti, Map<Task, Employee> solution ) {
 
 		// caso base negativo

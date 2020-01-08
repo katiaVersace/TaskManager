@@ -10,7 +10,7 @@ public interface TaskBusinessService {
 	
 	public TaskDto findById(int taskId);
 	
-	public void save(TaskDto task);
+	public TaskDto save(TaskDto task);
 	
 	public boolean update(TaskDto task);
 	

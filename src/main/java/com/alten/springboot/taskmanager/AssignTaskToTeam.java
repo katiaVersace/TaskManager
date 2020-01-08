@@ -289,8 +289,6 @@ public class AssignTaskToTeam {
 
 		}
 
-		// System.out.println(e.getUserName() + " available for task with start in " +
-		// startTask);
 		return true;
 	}
 

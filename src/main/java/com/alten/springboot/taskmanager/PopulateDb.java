@@ -19,6 +19,7 @@ public class PopulateDb {
 
 	public static void main(String[] args) {
 		
+	
 		//input
 		LocalDate start = LocalDate.parse("2019-12-16");
 		LocalDate end =  LocalDate.parse("2019-12-20");

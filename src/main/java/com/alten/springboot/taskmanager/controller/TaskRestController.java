@@ -47,7 +47,7 @@ public class TaskRestController implements ITaskRestController{
 
 		// se NON vuoi portare fuori le logiche strettamente di business
 		// 1) employeeService.insertTask(taskEntity, employId);
-		taskService.save(theTask);
+		theTask = taskService.save(theTask);
 		return theTask;
 	}
 

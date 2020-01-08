@@ -1,5 +1,6 @@
 package com.alten.springboot.taskmanager.business_service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,29 +39,41 @@ public class TaskBusinessServiceImpl implements TaskBusinessService {
 	}
 
 	@Override
-	public void save(TaskDto taskDto) {
+	public TaskDto save(TaskDto taskDto) {
 		Task task = modelMapper.map(taskDto, Task.class);
+		
+		if(!checkDate(task)) return null;
+
 		Employee employee = employeeDataService.findById(taskDto.getEmployeeId());
-		task.setEmployee(employee);
-		List<Task> tasks = employee.getTasks();
-		tasks.add(task);
-		taskDataService.save(task);
+		taskDto = null;
+		if (employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime())) {
+			task.setEmployee(employee);
+			List<Task> tasks = employee.getTasks();
+			tasks.add(task);
 
-		if (tasks.size() >= 5) {
+			taskDto = modelMapper.map(taskDataService.save(task), TaskDto.class);
 
-			employee.setTopEmployee(true);
-			employeeDataService.update(employee);
+			if (tasks.size() >= 5) {
+
+				employee.setTopEmployee(true);
+				employeeDataService.update(employee);
+			}
 		}
 
+		return taskDto;
 	}
 
 	@Override
 	public boolean update(TaskDto taskDto) {
-		
+
 		Task task = modelMapper.map(taskDto, Task.class);
-		if( taskDataService.update(task) != null)
+		// check sulle date
+		if(!checkDate(task)) return false;
+		
+		if (taskDataService.update(task) != null)
 			return true;
-		else return false;
+		else
+			return false;
 	}
 
 	@Override
@@ -112,4 +125,41 @@ public class TaskBusinessServiceImpl implements TaskBusinessService {
 		return tasksDto;
 	}
 
+	public boolean betweenTwoDate(LocalDate toCheck, LocalDate start, LocalDate end) {
+		boolean result = (toCheck.isAfter(start) && toCheck.isBefore(end)) || toCheck.equals(start)
+				|| toCheck.equals(end);
+		return result;
+	}
+
+	public boolean employeeAvailable(Employee e, LocalDate startTask, LocalDate endTask) {
+		for (Task t : e.getTasks()) {
+			if (betweenTwoDate(startTask, t.getExpectedStartTime(), t.getExpectedEndTime())
+					|| betweenTwoDate(endTask, t.getExpectedStartTime(), t.getExpectedEndTime())
+					|| betweenTwoDate(t.getExpectedStartTime(), startTask, endTask)
+					|| betweenTwoDate(t.getExpectedEndTime(), startTask, endTask)) {
+				return false;
+			}
+
+		}
+
+		return true;
+	}
+	
+	public boolean checkDate(Task theTask) {
+		// check sulle date
+		LocalDate today = LocalDate.now();
+		if (!((theTask.getExpectedStartTime().isAfter(today) || theTask.getExpectedStartTime().equals(today))
+				&& (theTask.getExpectedStartTime().isBefore(theTask.getExpectedEndTime())
+						|| theTask.getExpectedStartTime().equals(theTask.getExpectedEndTime()))))
+			return false;
+
+		if (theTask.getRealStartTime() != null || theTask.getRealEndTime() != null) {
+			if (!((theTask.getRealStartTime().isAfter(today)
+					|| theTask.getRealStartTime().equals(today))
+					&& (theTask.getRealStartTime().isBefore(theTask.getRealEndTime())
+							|| theTask.getRealStartTime().equals(theTask.getRealEndTime()))))
+				return false;
+		}
+		return  true;
+	}
 }

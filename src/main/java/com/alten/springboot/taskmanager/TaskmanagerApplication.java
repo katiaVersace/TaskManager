@@ -5,8 +5,10 @@ import java.time.format.DateTimeFormatter;
 
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.AbstractProvider;
+import org.modelmapper.Conditions;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.modelmapper.Provider;
 import org.modelmapper.TypeMap;
 import org.modelmapper.convention.MatchingStrategies;
@@ -17,6 +19,8 @@ import org.springframework.context.annotation.Bean;
 
 import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.entity.Task;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
@@ -75,6 +79,15 @@ public class TaskmanagerApplication extends SpringBootServletInitializer {
 	    modelMapper.addConverter(toDate);
 	  
 	    modelMapper.getTypeMap(String.class, LocalDate.class).setProvider(localDateProvider);
+	    
+	    modelMapper.addMappings(new PropertyMap<TaskDto, Task>() {
+	        @Override
+	        protected void configure() {
+	            when(Conditions.isNull()).skip().setRealStartTime(null);
+	            when(Conditions.isNull()).skip().setRealEndTime(null);
+	           
+	        }
+	    });
 	  
 		
 		
@@ -111,5 +124,8 @@ public class TaskmanagerApplication extends SpringBootServletInitializer {
 				.version("2.0").build();
 	}
 	// end
+	
+	
+	
 
 }
