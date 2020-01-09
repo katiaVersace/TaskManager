@@ -16,8 +16,6 @@ public interface TeamBusinessService {
     
     public void delete(int teamId);
     
-    public String populateDB();
-
     public String randomPopulation(String start, String end, int teams_size, int employees_size, int tasks_size,
 			int task_max_duration);
 

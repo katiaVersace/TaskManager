@@ -2,7 +2,6 @@ package com.alten.springboot.taskmanager.entity;
 
 import java.time.LocalDate;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,58 +10,43 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.hibernate.annotations.Cascade;
 import org.springframework.format.annotation.DateTimeFormat;
-
-
 
 @Entity
 @Table(name = "task")
-
 @XmlRootElement(name = "task")
-
 public class Task {
-	
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private int id;
 
-
 	@Column(name = "description", nullable = false)
 	private String description;
 
-	
 	@ManyToOne
-	@JoinColumn(name="employee_id")
+	@JoinColumn(name = "employee_id")
 	private Employee employee;
-	
-	
-	
-    @DateTimeFormat(pattern="yyyy-MM-dd")
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@Column(name = "expected_start_time", columnDefinition = "DATE")
 	private LocalDate expectedStartTime;
-	
-	
-    @DateTimeFormat(pattern="yyyy-MM-dd")
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@Column(name = "real_start_time", columnDefinition = "DATE")
 	private LocalDate realStartTime;
-	
-	
-    @DateTimeFormat(pattern="yyyy-MM-dd")
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@Column(name = "expected_end_time", columnDefinition = "DATE")
 	private LocalDate expectedEndTime;
-	
-	
-    @DateTimeFormat(pattern="yyyy-MM-dd")
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@Column(name = "real_end_time", columnDefinition = "DATE")
 	private LocalDate realEndTime;
-	
+
 	@Column(name = "version", nullable = false)
 	private int version;
 
@@ -151,6 +135,5 @@ public class Task {
 				+ expectedStartTime + ", realStartTime=" + realStartTime + ", expectedEndTime=" + expectedEndTime
 				+ ", realEndTime=" + realEndTime + ", version=" + version + "]";
 	}
-
 
 }

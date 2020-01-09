@@ -3,16 +3,13 @@ package com.alten.springboot.taskmanager.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "All details about the Employee. ")
-public class EmployeeDto implements Serializable{
-	
+public class EmployeeDto implements Serializable {
+
 	@ApiModelProperty(notes = "The database generated employee ID")
 	private int id;
 
@@ -30,13 +27,13 @@ public class EmployeeDto implements Serializable{
 
 	@ApiModelProperty(notes = "The employee email")
 	private String email;
-	
+
 	@ApiModelProperty(notes = "The employee Top Employee property")
 	private boolean topEmployee;
 
 	@ApiModelProperty(notes = "The employee's roles")
 	private Collection<RoleDto> roles;
-	
+
 	@ApiModelProperty(notes = "The employee version stored in the database")
 	private int version;
 
@@ -97,7 +94,7 @@ public class EmployeeDto implements Serializable{
 	}
 
 	public Collection<RoleDto> getRoles() {
-		if(roles == null)
+		if (roles == null)
 			roles = new ArrayList<RoleDto>();
 		return roles;
 	}
@@ -106,7 +103,6 @@ public class EmployeeDto implements Serializable{
 		this.roles = roles;
 	}
 
-
 	public int getVersion() {
 		return version;
 	}
@@ -114,7 +110,5 @@ public class EmployeeDto implements Serializable{
 	public void setVersion(int version) {
 		this.version = version;
 	}
-	
-	
 
 }

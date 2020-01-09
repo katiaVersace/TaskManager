@@ -20,21 +20,21 @@ import com.alten.springboot.taskmanager.dto.EmployeeDto;
 
 @Component
 public class LoginController implements ILoginController {
-	
+
 	@Autowired
 	private EmployeeDataService employeeService;
-	
+
 	@Autowired
 	private AuthenticationManager authManager;
-	
+
 	@Autowired
 	private ModelMapper modelMapper;
-	
-	private @Context  HttpServletRequest request;
-	
+
+	private @Context HttpServletRequest request;
+
 	@Override
-	public EmployeeDto login( @FormParam("username") String username, @FormParam("password")  String password) {
-		
+	public EmployeeDto login(@FormParam("username") String username, @FormParam("password") String password) {
+
 		UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(username, password);
 		try {
 			Authentication auth = authManager.authenticate(authReq);
@@ -57,12 +57,12 @@ public class LoginController implements ILoginController {
 
 	@Override
 	public String logout() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null){    
-            new SecurityContextLogoutHandler().logout(request, null, auth);
-        }
-    
-     return "logout";
-    }
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null) {
+			new SecurityContextLogoutHandler().logout(request, null, auth);
+		}
+
+		return "logout";
+	}
 
 }

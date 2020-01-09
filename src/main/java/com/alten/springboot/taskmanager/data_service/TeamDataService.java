@@ -14,8 +14,6 @@ public interface TeamDataService {
 	public Team update(Team team);
     
 	public void delete(int teamId);
-    
-	public String populateDB();
-	
+    	
 	public void deleteAll();
 }

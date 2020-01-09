@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alten.springboot.taskmanager.dao.TeamRepository;
-import com.alten.springboot.taskmanager.entity.Employee;
 import com.alten.springboot.taskmanager.entity.Team;
 
 @Service
@@ -18,13 +17,11 @@ public class TeamDataServiceImpl implements TeamDataService {
 	@Autowired
 	private TeamRepository teamDao;
 
-
 	@Override
 	@Transactional
 	public List<Team> findAll() {
 		List<Team> teams = teamDao.findAll();
 
-		
 		return teams;
 	}
 
@@ -32,7 +29,7 @@ public class TeamDataServiceImpl implements TeamDataService {
 	@Transactional
 	public Team findById(int teamId) {
 		Optional<Team> result = teamDao.findById(teamId);
-		
+
 		return result.get();
 	}
 
@@ -50,7 +47,7 @@ public class TeamDataServiceImpl implements TeamDataService {
 
 		if (result.isPresent()) {
 			Team oldTeam = result.get();
-			
+
 			// update only if you have the last version
 			int oldVersion = oldTeam.getVersion();
 			if (oldVersion == newTeam.getVersion()) {
@@ -61,7 +58,7 @@ public class TeamDataServiceImpl implements TeamDataService {
 				oldTeam.getEmployees().addAll(newTeam.getEmployees());
 
 				return teamDao.save(oldTeam);
-				
+
 			}
 
 			else {
@@ -87,14 +84,7 @@ public class TeamDataServiceImpl implements TeamDataService {
 
 	}
 
-	@Override
-	@Transactional
-	public String populateDB() {
-		
-		return "ok";
-
-	}
-
+	
 	@Override
 	@Transactional
 	public void deleteAll() {

@@ -1,7 +1,6 @@
 package com.alten.springboot.taskmanager.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,8 +10,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 import com.alten.springboot.taskmanager.data_service.EmployeeDataService;
@@ -41,16 +38,14 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.csrf().disable().authorizeRequests().antMatchers("/resteasy/auth/login").permitAll()
-		.antMatchers("/resteasy/employees/**").authenticated()
-		.antMatchers("/resteasy/tasks/**").authenticated()
-		.antMatchers("/resteasy/auth/**").authenticated()
-		
-		.and().formLogin()
-				.successHandler(customAuthenticationSuccessHandler).permitAll().and().logout().deleteCookies("JSESSIONID")
-	            
-	            .and()
-	            .rememberMe().key("uniqueAndSecret").tokenValiditySeconds(86400).and()
-				.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
+				.antMatchers("/resteasy/employees/**").authenticated().antMatchers("/resteasy/tasks/**").authenticated()
+				.antMatchers("/resteasy/auth/**").authenticated()
+
+				.and().formLogin().successHandler(customAuthenticationSuccessHandler).permitAll().and().logout()
+				.deleteCookies("JSESSIONID")
+
+				.and().rememberMe().key("uniqueAndSecret").tokenValiditySeconds(86400).and().exceptionHandling()
+				.accessDeniedHandler(accessDeniedHandler);
 
 	}
 
@@ -62,22 +57,21 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 		return auth;
 	}
 
-	 @Bean("authenticationManager")
-	    @Override
-	    public AuthenticationManager authenticationManagerBean() throws Exception {
-	            return super.authenticationManagerBean();
-	    }
-	 
-	  @Bean
-	    public CommonsRequestLoggingFilter logFilter() {
-	        CommonsRequestLoggingFilter filter
-	          = new CommonsRequestLoggingFilter();
-	        filter.setIncludeQueryString(true);
-	        filter.setIncludePayload(true);
-	        filter.setMaxPayloadLength(10000);
-	        filter.setIncludeHeaders(false);
-	        filter.setAfterMessagePrefix("REQUEST DATA : ");
-	        return filter;
-	    }
+	@Bean("authenticationManager")
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+
+	@Bean
+	public CommonsRequestLoggingFilter logFilter() {
+		CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
+		filter.setIncludeQueryString(true);
+		filter.setIncludePayload(true);
+		filter.setMaxPayloadLength(10000);
+		filter.setIncludeHeaders(false);
+		filter.setAfterMessagePrefix("REQUEST DATA : ");
+		return filter;
+	}
 
 }

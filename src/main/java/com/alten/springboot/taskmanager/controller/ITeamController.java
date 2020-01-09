@@ -26,12 +26,12 @@ import io.swagger.annotations.ApiParam;
 @Api(value = "Team Management System", description = "Operations pertaining to teams")
 @Path("/teams")
 public interface ITeamController {
-	
+
 	@ApiOperation(value = "Get Teams", response = String.class)
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<TeamDto> getTeams();
-	
+
 	@ApiOperation(value = "Get an Teams by Id", response = TeamDto.class)
 	@GET
 	@Path("/{teamId}")
@@ -42,8 +42,7 @@ public interface ITeamController {
 	@ApiOperation(value = "Add a team, allowed only to ADMIN employees", response = TeamDto.class)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@POST
-	//@Path("/teams")
-	@Consumes(MediaType.APPLICATION_JSON) 
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public TeamDto addTeam(
 			@ApiParam(value = "Team object store in database table", required = true) @RequestBody TeamDto theTeam);
@@ -51,8 +50,7 @@ public interface ITeamController {
 	@ApiOperation(value = "Update a team, allowed only to the Admin", response = TeamDto.class)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PUT
-	//@Path("/teams")
-	@Consumes(MediaType.APPLICATION_JSON) 
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public TeamDto updateTeam(
 			@ApiParam(value = "Updated Team object to store in database table", required = true) @RequestBody TeamDto theTeam);
@@ -69,19 +67,18 @@ public interface ITeamController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@POST
 	@Path("/randomPopulation")
-	@Consumes(MediaType.APPLICATION_JSON) 
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String randomPopulation(
 			@ApiParam(value = "Input variables", required = true) RandomPopulationInputDto input);
-	
+
 	@ApiOperation(value = "Assign Task to team with possibility to rearrange, allowed only to ADMIN employees", response = TaskDto.class)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@POST
 	@Path("/assignTaskToTeam/{teamId}")
-	@Consumes(MediaType.APPLICATION_JSON) 
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public TaskDto assignTaskToTeam(
-			@ApiParam(value = "Team Id", required = true) @PathParam("teamId") int teamId, @ApiParam(value = "Task to assign", required = true)TaskDto task);
-
+	public TaskDto assignTaskToTeam(@ApiParam(value = "Team Id", required = true) @PathParam("teamId") int teamId,
+			@ApiParam(value = "Task to assign", required = true) TaskDto task);
 
 }

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alten.springboot.taskmanager.business_service.TeamBusinessService;
-import com.alten.springboot.taskmanager.dto.EmployeeDto;
 import com.alten.springboot.taskmanager.dto.RandomPopulationInputDto;
 import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.dto.TeamDto;
@@ -52,10 +51,9 @@ public class TeamController implements ITeamController {
 	@Override
 	public String randomPopulation(RandomPopulationInputDto input) {
 
-//		teamService.deleteAll();
 		return teamService.randomPopulation(input.getStart(), input.getEnd(), input.getTeams_size(),
 				input.getEmployees_size(), input.getTasks_size(), input.getTask_max_duration());
-		
+
 	}
 
 	@Override

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.alten.springboot.taskmanager.dto.AvailabilityByEmployeeInputDto;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
 import com.alten.springboot.taskmanager.dto.TaskDto;
-import com.alten.springboot.taskmanager.dto.TeamDto;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,13 +28,8 @@ import io.swagger.annotations.ApiParam;
 @Path("/employees")
 public interface IEmployeeRestController {
 
-//	@ApiOperation(value = "Home", response = String.class)
-//	@GetMapping("/")
-//	public String getHello();
-
 	@ApiOperation(value = "View a list of available employees", response = List.class)
 	@GET
-	//@Path("/employees")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<EmployeeDto> getEmployees();
 
@@ -49,16 +43,17 @@ public interface IEmployeeRestController {
 	@ApiOperation(value = "Add an employee, allowed only to ADMIN employees", response = EmployeeDto.class)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@POST
-	//@Path("/employees")
+	@Path("/{admin}")
 	@Consumes(MediaType.APPLICATION_JSON) 
 	@Produces(MediaType.APPLICATION_JSON)
 	public EmployeeDto addEmployee(
+			@ApiParam(value = "Variable to distinguish if it's saving admin or not", required = true) @PathParam("admin") int admin,
 			@ApiParam(value = "Employee object store in database table", required = true) @RequestBody EmployeeDto theEmployee);
 
+		
 	@ApiOperation(value = "Update an employee, allowed only to the Admin or the interested Employee", response = EmployeeDto.class)
 	@PreAuthorize("@securityService.isOwner(principal.id,#theEmployee.getId()) or hasRole('ROLE_ADMIN')")
 	@PUT
-	//@Path("/employees")
 	@Consumes(MediaType.APPLICATION_JSON) 
 	@Produces(MediaType.APPLICATION_JSON)
 	public EmployeeDto updateEmployee(

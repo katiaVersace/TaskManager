@@ -19,8 +19,6 @@ import org.springframework.context.annotation.Bean;
 
 import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.entity.Task;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
@@ -33,11 +31,9 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-//@ComponentScan
-//@EnableAutoConfiguration
+
 @SpringBootApplication
 @EnableSwagger2
-//@EnableWebMvc
 public class TaskmanagerApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {

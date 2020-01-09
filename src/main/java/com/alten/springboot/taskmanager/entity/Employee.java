@@ -23,8 +23,6 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
-
 @Entity
 @Table(name = "employee")
 @XmlRootElement(name = "employee")
@@ -41,36 +39,28 @@ public class Employee {
 	@Column(name = "password", nullable = false)
 	private String password;
 
-	
 	@Column(name = "first_name", nullable = false)
 	private String firstName;
 
-	
 	@Column(name = "last_name", nullable = false)
 	private String lastName;
 
-	
 	@Column(name = "email", nullable = false)
 	private String email;
-	
-	
+
 	@Column(name = "top_employee", nullable = false)
 	private boolean topEmployee;
 
-	
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "employees_roles", 
-	joinColumns = @JoinColumn(name = "employee_id"), 
-	inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@JoinTable(name = "employees_roles", joinColumns = @JoinColumn(name = "employee_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private List<Role> roles;
-	
-	
+
 	@JsonIgnore
-	@OneToMany(mappedBy="employee",
-			   cascade= {CascadeType.PERSIST,CascadeType.REFRESH,CascadeType.REMOVE}, orphanRemoval = true)
+	@OneToMany(mappedBy = "employee", cascade = { CascadeType.PERSIST, CascadeType.REFRESH,
+			CascadeType.REMOVE }, orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Task> tasks;
-	
+
 	@Column(name = "version", nullable = false)
 	private int version;
 
@@ -79,7 +69,8 @@ public class Employee {
 		tasks = new ArrayList<Task>();
 	}
 
-	public Employee(String userName, String password, String firstName, String lastName, String email, boolean topEmployee) {
+	public Employee(String userName, String password, String firstName, String lastName, String email,
+			boolean topEmployee) {
 		this.userName = userName;
 		this.password = password;
 		this.firstName = firstName;
@@ -90,8 +81,8 @@ public class Employee {
 		tasks = new ArrayList<Task>();
 	}
 
-	public Employee(String userName, String password, String firstName, String lastName, String email,boolean topEmployee,
-			List<Role> roles) {
+	public Employee(String userName, String password, String firstName, String lastName, String email,
+			boolean topEmployee, List<Role> roles) {
 		this.userName = userName;
 		this.password = password;
 		this.firstName = firstName;
@@ -99,7 +90,7 @@ public class Employee {
 		this.email = email;
 		this.topEmployee = topEmployee;
 		this.roles = roles;
-		
+
 	}
 
 	public int getId() {
@@ -159,7 +150,7 @@ public class Employee {
 	}
 
 	public Collection<Role> getRoles() {
-		if(roles == null)
+		if (roles == null)
 			roles = new ArrayList<Role>();
 		return roles;
 	}
@@ -175,8 +166,7 @@ public class Employee {
 	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
 	}
-	
-	
+
 	public int getVersion() {
 		return version;
 	}
@@ -192,7 +182,4 @@ public class Employee {
 				+ ", version=" + version + "]";
 	}
 
-	
-
-	
 }

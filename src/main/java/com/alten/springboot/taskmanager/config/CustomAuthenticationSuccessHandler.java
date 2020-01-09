@@ -16,37 +16,31 @@ import org.springframework.stereotype.Component;
 import com.alten.springboot.taskmanager.data_service.EmployeeDataService;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
 
-
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    @Autowired
-    private EmployeeDataService employeeService;
-    
-    @Autowired
-	private ModelMapper modelMapper;
-	
-	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-			throws IOException, ServletException {
+	@Autowired
+	private EmployeeDataService employeeService;
 
-		//System.out.println("\n\nIn customAuthenticationSuccessHandler\n\n");
+	@Autowired
+	private ModelMapper modelMapper;
+
+	@Override
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+			Authentication authentication) throws IOException, ServletException {
+
 
 		String userName = authentication.getName();
-		
-		//System.out.println("userName=" + userName);
-		
+
+
 		EmployeeDto theUser = modelMapper.map(employeeService.findByUserName(userName), EmployeeDto.class);
-		
+
 		// now place in the session
 		HttpSession session = request.getSession();
 		session.setAttribute("user", theUser);
-		
-		
-		
-		
+
 		// forward to home page
-		
+
 		response.sendRedirect(request.getContextPath() + "/");
 	}
 

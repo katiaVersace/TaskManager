@@ -41,8 +41,9 @@ public class TaskBusinessServiceImpl implements TaskBusinessService {
 	@Override
 	public TaskDto save(TaskDto taskDto) {
 		Task task = modelMapper.map(taskDto, Task.class);
-		
-		if(!checkDate(task)) return null;
+
+		if (!checkDate(task))
+			return null;
 
 		Employee employee = employeeDataService.findById(taskDto.getEmployeeId());
 		taskDto = null;
@@ -67,9 +68,9 @@ public class TaskBusinessServiceImpl implements TaskBusinessService {
 	public boolean update(TaskDto taskDto) {
 
 		Task task = modelMapper.map(taskDto, Task.class);
-		// check sulle date
-		if(!checkDate(task)) return false;
-		
+		if (!checkDate(task))
+			return false;
+
 		if (taskDataService.update(task) != null)
 			return true;
 		else
@@ -98,7 +99,7 @@ public class TaskBusinessServiceImpl implements TaskBusinessService {
 
 			}
 			employeeDataService.update(employee);
-			// taskDataService.delete(taskId); //remove orphan
+
 		}
 	}
 
@@ -144,7 +145,7 @@ public class TaskBusinessServiceImpl implements TaskBusinessService {
 
 		return true;
 	}
-	
+
 	public boolean checkDate(Task theTask) {
 		// check sulle date
 		LocalDate today = LocalDate.now();
@@ -154,12 +155,11 @@ public class TaskBusinessServiceImpl implements TaskBusinessService {
 			return false;
 
 		if (theTask.getRealStartTime() != null || theTask.getRealEndTime() != null) {
-			if (!((theTask.getRealStartTime().isAfter(today)
-					|| theTask.getRealStartTime().equals(today))
+			if (!((theTask.getRealStartTime().isAfter(today) || theTask.getRealStartTime().equals(today))
 					&& (theTask.getRealStartTime().isBefore(theTask.getRealEndTime())
 							|| theTask.getRealStartTime().equals(theTask.getRealEndTime()))))
 				return false;
 		}
-		return  true;
+		return true;
 	}
 }

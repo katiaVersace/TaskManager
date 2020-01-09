@@ -52,7 +52,7 @@ public class TaskDataServiceImpl implements TaskDataService {
 				oldTask.setRealEndTime(newTask.getRealEndTime());
 
 				return taskDao.save(oldTask);
-				
+
 			}
 
 			else {
@@ -68,11 +68,9 @@ public class TaskDataServiceImpl implements TaskDataService {
 	@Override
 	@Transactional
 	public void delete(int taskId) {
-		System.out.println("Delete task " + taskId);
 		Optional<Task> result = taskDao.findById(taskId);
 
 		if (result.isPresent()) {
-			System.out.println("Delete task 1");
 			taskDao.deleteById(taskId);
 		} else
 			throw new NullPointerException("Task not found");

@@ -108,11 +108,9 @@ public class EmployeeDataServiceImpl implements EmployeeDataService {
 
 				oldEmployee.getTasks().clear();
 				oldEmployee.getTasks().addAll(newEmployee.getTasks());
-				
-				
 
 				return employeeDao.save(oldEmployee);
-				
+
 			}
 
 			else {

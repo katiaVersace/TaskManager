@@ -2,10 +2,10 @@ package com.alten.springboot.taskmanager.exception;
 
 public class CustomerErrorResponse {
 
-private int status;
-	
+	private int status;
+
 	private String message;
-	
+
 	private long timeStamp;
 
 	public CustomerErrorResponse() {

@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "Input for random Population service ")
-public class AvailabilityByEmployeeInputDto implements Serializable{
-	
+public class AvailabilityByEmployeeInputDto implements Serializable {
+
 	@ApiModelProperty(notes = "The first day for considered period")
 	private String start;
 
@@ -16,8 +16,7 @@ public class AvailabilityByEmployeeInputDto implements Serializable{
 
 	@ApiModelProperty(notes = "The employee_id")
 	private int employee_id;
-	
-	
+
 	public String getStart() {
 		return start;
 	}
@@ -42,7 +41,4 @@ public class AvailabilityByEmployeeInputDto implements Serializable{
 		this.employee_id = employee_id;
 	}
 
-	
-
-	
 }

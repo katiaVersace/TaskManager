@@ -7,7 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
 @Entity
 @Table(name = "role")
 public class Role {
@@ -22,7 +21,6 @@ public class Role {
 
 	public Role() {
 	}
-	
 
 	public Role(String name) {
 		this.name = name;

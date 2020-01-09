@@ -11,10 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.alten.springboot.taskmanager.business_service.TaskBusinessService;
 import com.alten.springboot.taskmanager.dto.TaskDto;
 
-
-
 @Component
-public class TaskRestController implements ITaskRestController{
+public class TaskRestController implements ITaskRestController {
 
 	@Autowired
 	private TaskBusinessService taskService;
@@ -25,8 +23,7 @@ public class TaskRestController implements ITaskRestController{
 	}
 
 	@Override
-	public TaskDto getTask(
-			 @PathParam("taskId") String taskId) {
+	public TaskDto getTask(@PathParam("taskId") String taskId) {
 
 		TaskDto theTask = taskService.findById(Integer.parseInt(taskId));
 
@@ -34,36 +31,22 @@ public class TaskRestController implements ITaskRestController{
 	}
 
 	@Override
-	public TaskDto addTask(
-			TaskDto theTask) {
+	public TaskDto addTask(TaskDto theTask) {
 		theTask.setId(0); // cioè inserisco, perche provo ad aggiornare ma l'id 0 non esiste
-
-		// se vuoi portare fuori le logiche strettamente di business
-		// 1) employeeService.insertTask(taskEntity, employId);
-		// 2) employeeService.findById(employId);
-		// 3) emplooyee.size() > 5
-		// 4) update attribute
-		// 5) employeeService.updateEmplyee(employee)
-
-		// se NON vuoi portare fuori le logiche strettamente di business
-		// 1) employeeService.insertTask(taskEntity, employId);
 		theTask = taskService.save(theTask);
 		return theTask;
 	}
 
 	@Override
-	public TaskDto updateTaskAdmin(
-			@RequestBody TaskDto theTask) {
-		
+	public TaskDto updateTaskAdmin(@RequestBody TaskDto theTask) {
+
 		taskService.update(theTask);
 		return theTask;
 	}
 
 	@Override
-	public TaskDto updateTask(
-			@RequestBody TaskDto theTask) {
+	public TaskDto updateTask(@RequestBody TaskDto theTask) {
 		TaskDto oldTask = taskService.findById(theTask.getId());
-		
 
 		if (theTask.getRealStartTime() != null) {
 			oldTask.setRealStartTime(theTask.getRealStartTime());
@@ -78,8 +61,7 @@ public class TaskRestController implements ITaskRestController{
 	}
 
 	@Override
-	public String deleteTask(
-			 @PathParam("taskId") String taskId ) {
+	public String deleteTask(@PathParam("taskId") String taskId) {
 
 		taskService.delete(Integer.parseInt(taskId));
 
@@ -88,8 +70,7 @@ public class TaskRestController implements ITaskRestController{
 	}
 
 	@Override
-	public List<TaskDto> getTasksByEmployeeId(
-			@PathParam("employeeId") String employeeId) {
+	public List<TaskDto> getTasksByEmployeeId(@PathParam("employeeId") String employeeId) {
 
 		List<TaskDto> tasks = taskService.findByEmployeeId(Integer.parseInt(employeeId));
 		return tasks;

@@ -63,6 +63,7 @@ public class EmployeeBusinessServiceImpl implements EmployeeBusinessService {
 	@Override
 	public void save(EmployeeDto employeeDto) {
 		Employee employee = modelMapper.map(employeeDto, Employee.class);
+		employee.setPassword("{noop}"+employee.getPassword());
 
 		employeeDataService.save(employee);
 
@@ -72,9 +73,10 @@ public class EmployeeBusinessServiceImpl implements EmployeeBusinessService {
 	public boolean update(EmployeeDto employeeDto) {
 		Employee employee = modelMapper.map(employeeDto, Employee.class);
 
-		if(employeeDataService.update(employee) != null)
+		if (employeeDataService.update(employee) != null)
 			return true;
-		else return false;
+		else
+			return false;
 	}
 
 	@Override
@@ -83,7 +85,6 @@ public class EmployeeBusinessServiceImpl implements EmployeeBusinessService {
 		for (Task t : employee.getTasks()) {
 			t.setEmployee(null);
 		}
-		// salvare i task??
 		employeeDataService.delete(employeeId);
 	}
 
@@ -91,17 +92,14 @@ public class EmployeeBusinessServiceImpl implements EmployeeBusinessService {
 	public List<EmployeeDto> getAvailableEmployeesByTeamAndTask(int teamId, TaskDto theTask) {
 		Team theTeam = teamDataService.findById(teamId);
 		List<EmployeeDto> result = new ArrayList<EmployeeDto>();
-		
-		for (Employee employee : theTeam.getEmployees()) {
-			
-			
 
+		for (Employee employee : theTeam.getEmployees()) {
 			if (employeeAvailable(employee.getTasks(), LocalDate.parse(theTask.getExpectedStartTime()),
 					LocalDate.parse(theTask.getExpectedEndTime()))) {
 				result.add(modelMapper.map(employee, EmployeeDto.class));
 			}
 		}
-		
+
 		return result;
 
 	}

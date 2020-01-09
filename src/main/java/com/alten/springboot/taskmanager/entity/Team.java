@@ -15,26 +15,24 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-
 @Entity
 @Table(name = "team")
 public class Team {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private int id;
-	
+
 	@Column(name = "name", nullable = false)
 	private String name;
-	
-	
+
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "employees_teams", 
-    joinColumns = { @JoinColumn(name = "team_id") }, 
-    inverseJoinColumns = { @JoinColumn(name = "employee_id") }, uniqueConstraints =   @UniqueConstraint(columnNames = {"team_id", "employee_id"}))
+	@JoinTable(name = "employees_teams", joinColumns = { @JoinColumn(name = "team_id") }, inverseJoinColumns = {
+			@JoinColumn(name = "employee_id") }, uniqueConstraints = @UniqueConstraint(columnNames = { "team_id",
+					"employee_id" }))
 	private Set<Employee> employees;
-	
+
 	@Column(name = "version", nullable = false)
 	private int version;
 
@@ -64,7 +62,7 @@ public class Team {
 	}
 
 	public Set<Employee> getEmployees() {
-		if(employees==null)
+		if (employees == null)
 			employees = new HashSet<Employee>();
 		return employees;
 	}
@@ -72,7 +70,7 @@ public class Team {
 	public void setEmployees(Set<Employee> employees) {
 		this.employees = employees;
 	}
-	
+
 	public int getVersion() {
 		return version;
 	}
@@ -85,9 +83,5 @@ public class Team {
 	public String toString() {
 		return "Team [id=" + id + ", name=" + name + ", employees=" + employees + ", version=" + version + "]";
 	}
-
-	
-	
-	
 
 }

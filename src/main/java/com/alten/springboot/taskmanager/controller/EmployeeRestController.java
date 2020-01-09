@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.alten.springboot.taskmanager.business_service.EmployeeBusinessService;
 import com.alten.springboot.taskmanager.dto.AvailabilityByEmployeeInputDto;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
+import com.alten.springboot.taskmanager.dto.RoleDto;
 import com.alten.springboot.taskmanager.dto.TaskDto;
-import com.alten.springboot.taskmanager.dto.TeamDto;
-
 
 @Component
 public class EmployeeRestController implements IEmployeeRestController {
@@ -25,15 +24,7 @@ public class EmployeeRestController implements IEmployeeRestController {
 	@Autowired
 	private EmployeeBusinessService employeeService;
 
-	
-	
-	private @Context  HttpServletRequest request;
-
-//	@Override
-//	public String getHello() {
-//
-//		return "Home";
-//	}
+	private @Context HttpServletRequest request;
 
 	@Override
 	public List<EmployeeDto> getEmployees() {
@@ -49,11 +40,25 @@ public class EmployeeRestController implements IEmployeeRestController {
 	}
 
 	@Override
-	public EmployeeDto addEmployee(@RequestBody EmployeeDto theEmployee) {
+	public EmployeeDto addEmployee(@PathParam("admin") int admin, @RequestBody EmployeeDto theEmployee) {
+		
 		theEmployee.setId(0); // cioè inserisco, perche provo ad aggiornare ma l'id 0 non esiste
+		
+		RoleDto employeeRole = new RoleDto();
+		employeeRole.setId(1);
+		theEmployee.getRoles().add(employeeRole);
+		
+		if(admin == 1) {
+			RoleDto adminRole = new RoleDto();
+			adminRole.setId(2);
+			theEmployee.getRoles().add(adminRole);
+		}
+		
 		employeeService.save(theEmployee);
 		return theEmployee;
 	}
+	
+	
 
 	@Override
 	public EmployeeDto updateEmployee(@RequestBody EmployeeDto theEmployee) {
@@ -83,17 +88,12 @@ public class EmployeeRestController implements IEmployeeRestController {
 	@Override
 	public List<EmployeeDto> getAvailableEmployeesByTeamAndTask(int teamId, TaskDto theTask) {
 		return employeeService.getAvailableEmployeesByTeamAndTask(teamId, theTask);
-		
+
 	}
 
 	@Override
 	public String getAvailabilityByEmployee(AvailabilityByEmployeeInputDto input) {
 		return employeeService.getAvailabilityByEmployee(input.getEmployee_id(), input.getStart(), input.getEnd());
 	}
-
-
-	
-
-
 
 }

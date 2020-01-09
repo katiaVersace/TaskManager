@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "Input for random Population service ")
-public class RandomPopulationInputDto implements Serializable{
-	
+public class RandomPopulationInputDto implements Serializable {
+
 	@ApiModelProperty(notes = "The first day for considered period")
 	private String start;
 
@@ -73,6 +73,5 @@ public class RandomPopulationInputDto implements Serializable{
 	public void setTask_max_duration(int task_max_duration) {
 		this.task_max_duration = task_max_duration;
 	}
-	
 
 }
