@@ -5,7 +5,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -111,7 +113,7 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 					"LastName_" + generatedString, generatedString + "@alten.it", false);
 			employee = employeeDataService.save(employee);
 			employees.add(employee);
-			
+
 		}
 
 		// create Teams
@@ -149,7 +151,6 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 
 			LocalDate endMinusDuration = end.plusDays(-duration);
 
-
 			LocalDate expectedStartTime = between(start, endMinusDuration);
 
 			LocalDate expected_end_time = expectedStartTime.plusDays(duration - 1);
@@ -169,8 +170,9 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 			if (employee.getTasks().size() >= 5) {
 
 				employee.setTopEmployee(true);
-				employee = employeeDataService.update(employee);
+
 			}
+			employees.set(employees.indexOf(employee), employeeDataService.update(employee));
 
 			task_index++;
 		}
@@ -180,13 +182,12 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 
 		boolean availability = true;
 		while (remainingTasks.size() != 0 && availability) {
-;
+
 			if (assignTask(remainingTasks.get(0), employees, start, end)) {
 				remainingTasks.remove(0);
 			} else {
 				availability = false;
-				System.out.println("Non sono riuscito ad assegnare i rimanenti " + remainingTasks.size()
-						+ " tasks, nessun impiegato ha più disponibilità nel periodo indicato");
+				
 			}
 
 		}
@@ -196,17 +197,24 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 			result = result.concat(printEmployeeScheduling(employee, days_max, start, end) + "\n");
 
 		}
-
-		System.out.println("RESULT: \n" + result);
+		
+		System.out.println("\nRESULT:");
+		for (int i = 0; i < days_max; i++) {
+			LocalDate currentDay = start.plusDays(i);
+			String day = String.valueOf(currentDay.getDayOfMonth());
+			if (currentDay.getDayOfMonth() < 10) {
+				day = "0" + day;
+			}
+			System.out.print(day + "  ");
+		}
+		System.out.println("\n" + result);
 		return result;
 	}
 
 	private String printEmployeeScheduling(Employee employee, long schedule_size, LocalDate start, LocalDate end) {
 
-		String result = "";
-
-		Boolean[] schedule = new Boolean[(int) schedule_size];
-		Arrays.fill(schedule, Boolean.FALSE);
+		String[] schedule = new String[(int) schedule_size];
+		Arrays.fill(schedule, "__");
 
 		for (Task task : employee.getTasks()) {
 			LocalDate taskStartDate = task.getExpectedStartTime();
@@ -224,20 +232,19 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 			long diff1 = ChronoUnit.DAYS.between(start, taskStartDate);
 			long task_duration = ChronoUnit.DAYS.between(taskStartDate, taskEndDate) + 1;
 
+			String stringToPrint = toString(task.getId(), 36);
+			if (stringToPrint.length() < 2)
+				stringToPrint = "0" + stringToPrint;
+
 			for (int i = (int) diff1; i < diff1 + task_duration; i++) {
-				schedule[i] = true;
-			}
-
-		}
-
-		result = result.concat(employee.getUserName() + " ");
-		for (Boolean value : schedule) {
-			if (value.booleanValue() == true) {
-				result = result.concat("X ");
-			} else {
-				result = result.concat("_ ");
+				schedule[i] = stringToPrint;
 			}
 		}
+
+		String result = "";
+		for (String c : schedule)
+			result = result.concat(c + "  ");
+		result = result.concat(employee.getUserName());
 
 		return result;
 
@@ -282,8 +289,9 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 				if (employee.getTasks().size() >= 5) {
 
 					employee.setTopEmployee(true);
-					employeeDataService.update(employee);
+
 				}
+				employees.set(employees.indexOf(employee), employeeDataService.update(employee));
 				return true;
 			}
 		}
@@ -303,8 +311,9 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 				if (employee.getTasks().size() >= 5) {
 
 					employee.setTopEmployee(true);
-					employee = employeeDataService.update(employee);
+
 				}
+				employees.set(employees.indexOf(employee), employeeDataService.update(employee));
 				return true;
 			}
 		}
@@ -374,6 +383,10 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 
 		long days_max = ChronoUnit.DAYS.between(start, end) + 1;
 
+		// order
+		orderByTasksNumberInPeriod(theTeam.getEmployees(), theTask.getExpectedStartTime(),
+				theTask.getExpectedEndTime());
+
 		List<Task> visti = new ArrayList<>();
 		Map<Task, Employee> solution = new HashMap<>();
 		if (assignTaskToTeam(theTask, theTeam.getEmployees(), visti, solution)) {
@@ -390,9 +403,25 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 				theTaskDto = modelMapper.map(taskDataService.save(entry.getKey()), TaskDto.class);
 			}
 
-			for (Employee e : theTeam.getEmployees()) {
-				System.out.println(printEmployeeScheduling(e, days_max, start, end));
+			String result = "";
+			start = start.minusDays(15);
+			end = end.plusDays(15);
+			days_max = (ChronoUnit.DAYS.between(start, end)) + 1;
+			for (Employee employee : theTeam.getEmployees()) {
+				result = result.concat(printEmployeeScheduling(employee, days_max, start, end) + "\n");
+
 			}
+			
+			System.out.println("\nRESULT:");
+			for (int i = 0; i < days_max; i++) {
+				LocalDate currentDay = start.plusDays(i);
+				String day = String.valueOf(currentDay.getDayOfMonth());
+				if (currentDay.getDayOfMonth() < 10) {
+					day = "0" + day;
+				}
+				System.out.print(day + "  ");
+			}
+			System.out.println("\n" + result);
 
 			return theTaskDto;
 		} else {
@@ -433,7 +462,12 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 
 					solution.put(task, employee);
 
-					return true;
+					if (isValid(solution)) {
+						return true;
+					} else {
+						solution.remove(task);
+					}
+
 				}
 			}
 		}
@@ -449,7 +483,11 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 						task.getExpectedEndTime());
 
 				int result = 1;
-				Map<Task, Employee> partialSolution = new HashMap<Task, Employee>();
+				Map<Task, Employee> partialSolution = new HashMap<Task, Employee>(solution);
+				partialSolution.put(task, employee);
+				if (!isValid(partialSolution)) {
+					continue;
+				}
 				for (Task task_to_rearrange : tasks_in_period) {
 					if (taskInProgress(task_to_rearrange)
 							|| !assignTaskToTeam(task_to_rearrange, team, visti, partialSolution)) {
@@ -459,15 +497,16 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 					}
 
 				}
-
-				if (result > 0) {
+				if (result > 0 && isValid(partialSolution)) {
 					// copy
 					for (Map.Entry<Task, Employee> entry : partialSolution.entrySet()) {
 						solution.put(entry.getKey(), entry.getValue());
 					}
 
-					solution.put(task, employee);
 					return true;
+				} else {
+					partialSolution.remove(task);
+
 				}
 
 			}
@@ -527,6 +566,78 @@ public class TeamBusinessServiceImpl implements TeamBusinessService {
 	public void deleteAll() {
 		teamDataService.deleteAll();
 
+	}
+
+	public boolean inConflict(Task t1, Task t2) {
+
+		if (betweenTwoDate(t1.getExpectedStartTime(), t2.getExpectedStartTime(), t2.getExpectedEndTime())
+				|| betweenTwoDate(t1.getExpectedEndTime(), t2.getExpectedStartTime(), t2.getExpectedEndTime())
+				|| betweenTwoDate(t2.getExpectedStartTime(), t1.getExpectedStartTime(), t1.getExpectedEndTime())
+				|| betweenTwoDate(t2.getExpectedEndTime(), t1.getExpectedStartTime(), t1.getExpectedEndTime())) {
+
+			return true;
+
+		} else {
+
+			return false;
+
+		}
+
+	}
+
+	public boolean isValid(Map<Task, Employee> solution) {
+		for (Map.Entry<Task, Employee> firstEntry : solution.entrySet()) {
+			for (Map.Entry<Task, Employee> secondEntry : solution.entrySet()) {
+
+				if (firstEntry.getKey() != secondEntry.getKey()
+						&& firstEntry.getValue().getId() == secondEntry.getValue().getId()
+						&& inConflict(firstEntry.getKey(), secondEntry.getKey())) {
+
+					return false;
+				}
+			}
+
+		}
+		return true;
+	}
+
+	public void orderByTasksNumberInPeriod(Set<Employee> employees, LocalDate start, LocalDate end) {
+
+		List<Employee> orderedEmployees = new ArrayList<Employee>(employees);
+
+		Collections.sort(orderedEmployees, new Comparator<Employee>() {
+			public int compare(Employee e1, Employee e2) {
+				if (getTasksInPeriod(e1, start, end).size() == getTasksInPeriod(e2, start, end).size())
+					return 0;
+				return getTasksInPeriod(e1, start, end).size() < getTasksInPeriod(e2, start, end).size() ? -1 : 1;
+			}
+		});
+
+		employees = new HashSet<Employee>(orderedEmployees);
+	}
+
+	public String toString(int i, int radix) { // SORGENTE RICAVATO dal toString di java > Integer.toString(n, 16);
+		String SYMBOLS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
+		char[] digits = SYMBOLS.toCharArray();
+		char[] buf = new char[33];
+		boolean negative = (i < 0);
+		int charPos = 32;
+
+		if (!negative) {
+			i = -i;
+		}
+
+		while (i <= -radix) {
+			buf[charPos--] = digits[-(i % radix)];
+			i = i / radix;
+		}
+		buf[charPos] = digits[-i];
+
+		if (negative) {
+			buf[--charPos] = '-';
+		}
+
+		return new String(buf, charPos, (33 - charPos));
 	}
 
 }

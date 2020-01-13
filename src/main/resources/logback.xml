@@ -5,20 +5,8 @@
         </encoder>
     </appender>
 
-    <logger name="org.jboss.resteasy" additivity="false">
-        <level value="TRACE"/>
-        <appender-ref ref="STDOUT"/>
-    </logger>
-    
-    <logger name="io.swagger" additivity="false">
-        <level value="TRACE"/>
-        <appender-ref ref="STDOUT"/>
-    </logger>
-    
-    <logger name="org.springframework.security" additivity="false">
-        <level value="TRACE"/>
-        <appender-ref ref="STDOUT"/>
-    </logger>
+
+ 
     
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

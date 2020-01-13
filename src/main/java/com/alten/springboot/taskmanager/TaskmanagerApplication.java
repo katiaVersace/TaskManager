@@ -1,5 +1,6 @@
 package com.alten.springboot.taskmanager;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -121,7 +122,10 @@ public class TaskmanagerApplication extends SpringBootServletInitializer {
 	}
 	// end
 	
-	
+	@Bean(initMethod="start",destroyMethod="stop")
+	public org.h2.tools.Server h2WebConsoleServer () throws SQLException {
+	    return org.h2.tools.Server.createWebServer("-web","-webAllowOthers","-webDaemon","-webPort", "8082");
+	}
 	
 
 }
