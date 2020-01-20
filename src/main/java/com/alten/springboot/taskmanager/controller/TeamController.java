@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.alten.springboot.taskmanager.business_service.TeamBusinessService;
+import com.alten.springboot.taskmanager.businessservice.ITeamBusinessService;
 import com.alten.springboot.taskmanager.dto.RandomPopulationInputDto;
 import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.dto.TeamDto;
@@ -14,7 +14,7 @@ import com.alten.springboot.taskmanager.dto.TeamDto;
 public class TeamController implements ITeamController {
 
 	@Autowired
-	private TeamBusinessService teamService;
+	private ITeamBusinessService teamService;
 
 	@Override
 	public List<TeamDto> getTeams() {

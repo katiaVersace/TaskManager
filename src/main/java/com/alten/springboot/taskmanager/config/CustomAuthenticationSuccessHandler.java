@@ -13,14 +13,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import com.alten.springboot.taskmanager.data_service.EmployeeDataService;
+import com.alten.springboot.taskmanager.dataservice.IEmployeeDataService;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
 
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
 	@Autowired
-	private EmployeeDataService employeeService;
+	private IEmployeeDataService employeeService;
 
 	@Autowired
 	private ModelMapper modelMapper;

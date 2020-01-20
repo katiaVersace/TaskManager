@@ -15,14 +15,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Component;
 
-import com.alten.springboot.taskmanager.data_service.EmployeeDataService;
+import com.alten.springboot.taskmanager.dataservice.IEmployeeDataService;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
 
 @Component
 public class LoginController implements ILoginController {
 
 	@Autowired
-	private EmployeeDataService employeeService;
+	private IEmployeeDataService employeeService;
 
 	@Autowired
 	private AuthenticationManager authManager;

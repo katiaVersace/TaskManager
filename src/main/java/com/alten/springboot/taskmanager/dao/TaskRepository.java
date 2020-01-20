@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.alten.springboot.taskmanager.entity.Task;
+import com.alten.springboot.taskmanager.model.Task;
 
 public interface TaskRepository  extends JpaRepository<Task, Integer> {
 	

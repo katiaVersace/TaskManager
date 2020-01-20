@@ -9,7 +9,10 @@ import java.lang.annotation.RetentionPolicy;
 
 import java.lang.annotation.ElementType;
 
-@Target({ElementType.METHOD})
+/*
+ * To enable PATCH for RestEasy we need to define a annotation annotated with @HttpMethod
+ */
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @HttpMethod("PATCH")
 public @interface PATCH {
