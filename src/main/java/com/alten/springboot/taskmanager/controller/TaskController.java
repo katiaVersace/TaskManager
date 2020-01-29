@@ -23,7 +23,7 @@ public class TaskController implements ITaskController {
 	}
 
 	@Override
-	public TaskDto getTask(@PathParam("taskId") String taskId) {
+	public TaskDto getTask( String taskId) {
 
 		TaskDto theTask = taskService.findById(Integer.parseInt(taskId));
 
@@ -55,13 +55,14 @@ public class TaskController implements ITaskController {
 			oldTask.setRealEndTime(theTask.getRealEndTime());
 		}
 
+
 		taskService.update(oldTask);
 
 		return oldTask;
 	}
 
 	@Override
-	public String deleteTask(@PathParam("taskId") String taskId) {
+	public String deleteTask(String taskId) {
 
 		taskService.delete(Integer.parseInt(taskId));
 
@@ -70,7 +71,7 @@ public class TaskController implements ITaskController {
 	}
 
 	@Override
-	public List<TaskDto> getTasksByEmployeeId(@PathParam("employeeId") String employeeId) {
+	public List<TaskDto> getTasksByEmployeeId( String employeeId) {
 
 		List<TaskDto> tasks = taskService.findByEmployeeId(Integer.parseInt(employeeId));
 		return tasks;

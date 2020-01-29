@@ -37,6 +37,7 @@ public class TaskDataService implements ITaskDataService {
 	@Transactional
 	public Task update(Task newTask) {
 
+
 		Optional<Task> result = taskDao.findById(newTask.getId());
 		if (result.isPresent()) {
 			Task oldTask = result.get();
@@ -50,6 +51,7 @@ public class TaskDataService implements ITaskDataService {
 				oldTask.setRealStartTime(newTask.getRealStartTime());
 				oldTask.setExpectedEndTime(newTask.getExpectedEndTime());
 				oldTask.setRealEndTime(newTask.getRealEndTime());
+
 
 				return taskDao.save(oldTask);
 

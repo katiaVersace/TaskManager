@@ -1,15 +1,12 @@
 package com.alten.springboot.taskmanager.controller;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +19,15 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 @Api(value = "Task Management System", description = "Operations pertaining to task in Task Management System")
+/*
+ * To enable PATCH for RestEasy we need to define a annotation annotated with @HttpMethod
+ */
+@Target({ ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+@HttpMethod("PATCH")
+@interface PATCH {
+}
+
 
 @Path("/tasks")
 public interface ITaskController {
@@ -54,7 +60,7 @@ public interface ITaskController {
 			@ApiParam(value = "Updated Task object to store in database table", required = true) @RequestBody TaskDto theTask);
 
 	@ApiOperation(value = "Patch a task, allowed only to ADMIN employees and to the owner of  the task", response = TaskDto.class)
-	@PreAuthorize("@securityService.isOwner(principal.id,#theTask.getEmployeeId()) or hasRole('ROLE_ADMIN')")
+	@PreAuthorize("@securityDataService.isOwner(principal.id,#theTask.getEmployeeId()) or hasRole('ROLE_ADMIN')")
 	@PATCH
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)

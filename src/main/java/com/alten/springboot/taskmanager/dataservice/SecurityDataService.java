@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 public class SecurityDataService {
   
    public boolean isOwner(int id1, int id2) {
-	   System.out.println(id1);
-	   System.out.println(id2);
 	    return id1 == id2;
    }
 }
