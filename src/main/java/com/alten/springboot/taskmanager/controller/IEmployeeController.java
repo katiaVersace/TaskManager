@@ -52,7 +52,7 @@ public interface IEmployeeController {
 
 		
 	@ApiOperation(value = "Update an employee, allowed only to the Admin or the interested Employee", response = EmployeeDto.class)
-	@PreAuthorize("@securityService.isOwner(principal.id,#theEmployee.getId()) or hasRole('ROLE_ADMIN')")
+	@PreAuthorize("@securityDataService.isOwner(principal.id,#theEmployee.getId()) or hasRole('ROLE_ADMIN')")
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON) 
 	@Produces(MediaType.APPLICATION_JSON)
