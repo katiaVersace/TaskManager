@@ -74,10 +74,7 @@ public class EmployeeDataService implements IEmployeeDataService {
 	@Override
 	@Transactional
 	public Employee save(Employee employee) {
-		List<Role> roles = new ArrayList<Role>();
-		for (Role r : employee.getRoles()) {
-			roles.add(roleDao.findById(r.getId()).get());
-		}
+		List<Role> roles = employee.getRoles().stream().map(r -> roleDao.findById(r.getId()).get()).collect(Collectors.toList());
 		employee.setRoles(roles);
 
 		return employeeDao.save(employee);

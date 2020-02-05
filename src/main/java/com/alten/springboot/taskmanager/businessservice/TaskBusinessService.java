@@ -1,171 +1,126 @@
 package com.alten.springboot.taskmanager.businessservice;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.alten.springboot.taskmanager.dataservice.IEmployeeDataService;
 import com.alten.springboot.taskmanager.dataservice.ITaskDataService;
 import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.model.Employee;
 import com.alten.springboot.taskmanager.model.Task;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskBusinessService implements ITaskBusinessService {
 
-	@Autowired
-	private ITaskDataService taskDataService;
+    @Autowired
+    private ITaskDataService taskDataService;
 
-	@Autowired
-	private IEmployeeDataService employeeDataService;
+    @Autowired
+    private IEmployeeDataService employeeDataService;
 
-	@Autowired
-	private ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-	@Override
-	public TaskDto findById(int taskId) {
-		Task task = taskDataService.findById(taskId);
+    public static boolean checkDate(Task theTask) {
+        // check sulle date
+        LocalDate today = LocalDate.now();
+        if ((!((theTask.getExpectedStartTime().isAfter(today) || theTask.getExpectedStartTime().equals(today))
+                && (theTask.getExpectedStartTime().isBefore(theTask.getExpectedEndTime())
+                || theTask.getExpectedStartTime().equals(theTask.getExpectedEndTime()))))
+                || ((theTask.getRealStartTime() != null || theTask.getRealEndTime() != null) &&
+                !((theTask.getRealStartTime().isAfter(today) || theTask.getRealStartTime().equals(today))
+                        && (theTask.getRealStartTime().isBefore(theTask.getRealEndTime())
+                        || theTask.getRealStartTime().equals(theTask.getRealEndTime())))))
+            return false;
 
-		TaskDto taskDto = null;
-		if (task != null) {
-			taskDto = modelMapper.map(task, TaskDto.class);
-		}
-		return taskDto;
+        return true;
+    }
 
-	}
+    @Override
+    public TaskDto findById(int taskId) {
+        Task task = taskDataService.findById(taskId);
 
-	@Override
-	public TaskDto save(TaskDto taskDto) {
-		Task task = modelMapper.map(taskDto, Task.class);
+        TaskDto taskDto = null;
+        if (task != null) {
+            taskDto = modelMapper.map(task, TaskDto.class);
+        }
+        return taskDto;
 
-		if (!checkDate(task))
-			return null;
+    }
 
-		Employee employee = employeeDataService.findById(taskDto.getEmployeeId());
-		taskDto = null;
-		if (employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime())) {
-			task.setEmployee(employee);
-			List<Task> tasks = employee.getTasks();
-			tasks.add(task);
+    @Override
+    public TaskDto save(TaskDto taskDto) {
+        Task task = modelMapper.map(taskDto, Task.class);
 
-			taskDto = modelMapper.map(taskDataService.save(task), TaskDto.class);
+        if (!checkDate(task))
+            return null;
 
-			if (tasks.size() >= 5) {
+        Employee employee = employeeDataService.findById(taskDto.getEmployeeId());
+        taskDto = null;
+        if (EmployeeBusinessService.employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime())) {
+            task.setEmployee(employee);
+            List<Task> tasks = employee.getTasks();
+            if (!tasks.contains(task))
+                tasks.add(task);
 
-				employee.setTopEmployee(true);
-				employeeDataService.update(employee);
-			}
-		}
+            taskDto = modelMapper.map(taskDataService.save(task), TaskDto.class);
 
-		return taskDto;
-	}
+            if (tasks.size() >= 5 && !employee.isTopEmployee()) {
 
-	@Override
-	public boolean update(TaskDto taskDto) {
+                employee.setTopEmployee(true);
+                employeeDataService.update(employee);
+            }
+        }
 
-		Task task = modelMapper.map(taskDto, Task.class);
-		task.setRealStartTime(LocalDate.parse(taskDto.getRealStartTime()));
-		task.setRealEndTime(LocalDate.parse(taskDto.getRealEndTime()));
+        return taskDto;
+    }
 
-		if (!checkDate(task)) {
-			return false;
-		}
-		Task result = taskDataService.update(task);
-		if (result != null) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+    @Override
+    public boolean update(TaskDto taskDto) {
 
-	@Override
-	public void delete(int taskId) {
-		Task task = taskDataService.findById(taskId);
-		Employee employee = employeeDataService.findById(task.getEmployee().getId());
-		List<Task> tasks = employee.getTasks();
+        Task task = modelMapper.map(taskDto, Task.class);
+        //task.setRealStartTime(LocalDate.parse(taskDto.getRealStartTime()));
+        //task.setRealEndTime(LocalDate.parse(taskDto.getRealEndTime()));
+        if (!checkDate(task)) {
+            return false;
+        }
+        Task result = taskDataService.update(task);
 
-		Task taskToDelete = null;
-		for (Task t : tasks) {
-			if (t.getId() == taskId) {
-				taskToDelete = t;
-			}
-		}
+        return (result != null) ? true : false;
+    }
 
-		if (taskToDelete != null) {
-			tasks.remove(taskToDelete);
-			taskToDelete.setEmployee(null);
+    @Override
+    public void delete(int taskId) {
 
-			if (employee.getTasks().size() < 5) {
-				employee.setTopEmployee(false);
+        Task task = taskDataService.findById(taskId);
+        Employee employee = employeeDataService.findById(task.getEmployee().getId());
+        List<Task> tasks = employee.getTasks();
 
-			}
-			employeeDataService.update(employee);
+        Task taskToDelete = tasks.stream().filter(t -> t.getId() == taskId).findFirst().orElse(null);
+        if (taskToDelete != null) {
+            tasks.remove(taskToDelete);
+            taskToDelete.setEmployee(null);
 
-		}
-	}
+            if (employee.getTasks().size() < 5 && employee.isTopEmployee()) {
+                employee.setTopEmployee(false);
 
-	@Override
-	public List<TaskDto> findAll() {
+            }
+            employeeDataService.update(employee);
 
-		List<Task> tasks = taskDataService.findAll();
+        }
+    }
 
-		List<TaskDto> tasksDto = new ArrayList<TaskDto>();
-		for (Task task : tasks) {
-			tasksDto.add(modelMapper.map(task, TaskDto.class));
-		}
-		return tasksDto;
+    @Override
+    public List<TaskDto> findAll() {
+        return taskDataService.findAll().stream().map(task -> modelMapper.map(task, TaskDto.class)).collect(Collectors.toList());
+    }
 
-	}
-
-	@Override
-	public List<TaskDto> findByEmployeeId(int employeeId) {
-		List<Task> tasks = taskDataService.findByEmployeeId(employeeId);
-		List<TaskDto> tasksDto = new ArrayList<TaskDto>();
-		for (Task task : tasks) {
-			tasksDto.add(modelMapper.map(task, TaskDto.class));
-		}
-		return tasksDto;
-	}
-
-	public boolean betweenTwoDate(LocalDate toCheck, LocalDate start, LocalDate end) {
-		boolean result = (toCheck.isAfter(start) && toCheck.isBefore(end)) || toCheck.equals(start)
-				|| toCheck.equals(end);
-		return result;
-	}
-
-	public boolean employeeAvailable(Employee e, LocalDate startTask, LocalDate endTask) {
-		for (Task t : e.getTasks()) {
-			if (betweenTwoDate(startTask, t.getExpectedStartTime(), t.getExpectedEndTime())
-					|| betweenTwoDate(endTask, t.getExpectedStartTime(), t.getExpectedEndTime())
-					|| betweenTwoDate(t.getExpectedStartTime(), startTask, endTask)
-					|| betweenTwoDate(t.getExpectedEndTime(), startTask, endTask)) {
-				return false;
-			}
-
-		}
-
-		return true;
-	}
-
-	public boolean checkDate(Task theTask) {
-		// check sulle date
-		LocalDate today = LocalDate.now();
-		if (!((theTask.getExpectedStartTime().isAfter(today) || theTask.getExpectedStartTime().equals(today))
-				&& (theTask.getExpectedStartTime().isBefore(theTask.getExpectedEndTime())
-						|| theTask.getExpectedStartTime().equals(theTask.getExpectedEndTime()))))
-			return false;
-
-		if (theTask.getRealStartTime() != null || theTask.getRealEndTime() != null) {
-			if (!((theTask.getRealStartTime().isAfter(today) || theTask.getRealStartTime().equals(today))
-					&& (theTask.getRealStartTime().isBefore(theTask.getRealEndTime())
-							|| theTask.getRealStartTime().equals(theTask.getRealEndTime()))))
-				return false;
-		}
-		return true;
-	}
+    @Override
+    public List<TaskDto> findByEmployeeId(int employeeId) {
+        return taskDataService.findByEmployeeId(employeeId).stream().map(task -> modelMapper.map(task, TaskDto.class)).collect(Collectors.toList());
+    }
 }

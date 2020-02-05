@@ -33,13 +33,12 @@ public class TaskController implements ITaskController {
 	@Override
 	public TaskDto addTask(TaskDto theTask) {
 		theTask.setId(0); // cioè inserisco, perche provo ad aggiornare ma l'id 0 non esiste
-		theTask = taskService.save(theTask);
-		return theTask;
+		return taskService.save(theTask);
+
 	}
 
 	@Override
 	public TaskDto updateTaskAdmin(@RequestBody TaskDto theTask) {
-
 		taskService.update(theTask);
 		return theTask;
 	}
@@ -54,8 +53,6 @@ public class TaskController implements ITaskController {
 		if (theTask.getRealEndTime() != null) {
 			oldTask.setRealEndTime(theTask.getRealEndTime());
 		}
-
-
 		taskService.update(oldTask);
 
 		return oldTask;

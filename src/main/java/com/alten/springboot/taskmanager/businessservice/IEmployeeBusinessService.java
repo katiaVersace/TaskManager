@@ -14,7 +14,7 @@ public interface IEmployeeBusinessService
 
     public EmployeeDto findById(int employeeId);
     
-    public void save(EmployeeDto employee);
+    public EmployeeDto save(EmployeeDto employee);
     
     public boolean update(EmployeeDto employee);
     

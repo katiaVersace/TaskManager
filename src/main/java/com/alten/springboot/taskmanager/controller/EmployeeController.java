@@ -53,9 +53,7 @@ public class EmployeeController implements IEmployeeController {
 			adminRole.setId(2);
 			theEmployee.getRoles().add(adminRole);
 		}
-		
-		employeeService.save(theEmployee);
-		return theEmployee;
+		return employeeService.save(theEmployee);
 	}
 	
 	

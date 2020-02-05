@@ -38,13 +38,12 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.csrf().disable().authorizeRequests().antMatchers("/resteasy/auth/login").permitAll()
-				.antMatchers("/resteasy/employees/**").authenticated().antMatchers("/resteasy/tasks/**").authenticated()
+				.antMatchers("/resteasy/employees/**").authenticated()
+				.antMatchers("/resteasy/tasks/**").authenticated()
+				.antMatchers("/resteasy/teams/**").authenticated()
 				.antMatchers("/resteasy/auth/**").authenticated()
-
-
 				.and().formLogin().successHandler(customAuthenticationSuccessHandler).permitAll().and().logout()
 				.deleteCookies("JSESSIONID")
-
 				.and().rememberMe().key("uniqueAndSecret").tokenValiditySeconds(86400).and().exceptionHandling()
 				.accessDeniedHandler(accessDeniedHandler);
 

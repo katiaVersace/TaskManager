@@ -71,7 +71,6 @@ public class TaskDataService implements ITaskDataService {
 	@Transactional
 	public void delete(int taskId) {
 		Optional<Task> result = taskDao.findById(taskId);
-
 		if (result.isPresent()) {
 			taskDao.deleteById(taskId);
 		} else

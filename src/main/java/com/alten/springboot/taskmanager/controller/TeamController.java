@@ -23,9 +23,8 @@ public class TeamController implements ITeamController {
 
 	@Override
 	public TeamDto getTeam(int teamId) {
-		TeamDto team = teamService.findById(teamId);
+		return teamService.findById(teamId);
 
-		return team;
 	}
 
 	@Override

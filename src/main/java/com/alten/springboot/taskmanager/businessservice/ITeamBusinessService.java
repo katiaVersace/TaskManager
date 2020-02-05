@@ -1,16 +1,16 @@
 package com.alten.springboot.taskmanager.businessservice;
 
-import java.util.List;
-
 import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.dto.TeamDto;
+
+import java.util.List;
 
 public interface ITeamBusinessService {
 	public List<TeamDto> findAll();
 	
 	public TeamDto findById(int teamId);
     
-	public void save(TeamDto team);
+	public TeamDto save(TeamDto team);
     
     public boolean update(TeamDto team);
     
