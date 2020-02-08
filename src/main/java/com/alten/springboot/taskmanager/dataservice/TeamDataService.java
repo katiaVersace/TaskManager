@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import com.alten.springboot.taskmanager.model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,19 +44,22 @@ public class TeamDataService implements ITeamDataService {
 	@Override
 	@Transactional
 	public Team update(Team newTeam) {
+
 		Optional<Team> result = teamDao.findById(newTeam.getId());
 
 		if (result.isPresent()) {
+
 			Team oldTeam = result.get();
 
 			// update only if you have the last version
 			int oldVersion = oldTeam.getVersion();
 			if (oldVersion == newTeam.getVersion()) {
+
+
 				oldTeam.setVersion(oldVersion + 1);
 				oldTeam.setName(newTeam.getName());
 
-				oldTeam.getEmployees().clear();
-				oldTeam.getEmployees().addAll(newTeam.getEmployees());
+				oldTeam.setEmployees(newTeam.getEmployees());
 
 				return teamDao.save(oldTeam);
 

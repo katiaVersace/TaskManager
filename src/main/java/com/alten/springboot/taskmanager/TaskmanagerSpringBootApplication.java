@@ -21,8 +21,6 @@ import org.springframework.context.annotation.Bean;
 import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.model.Task;
 
-import io.swagger.jaxrs.listing.ApiListingResource;
-import io.swagger.jaxrs.listing.SwaggerSerializers;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -76,34 +74,15 @@ public class TaskmanagerSpringBootApplication extends SpringBootServletInitializ
 	    modelMapper.addConverter(toDate);
 	  
 	    modelMapper.getTypeMap(String.class, LocalDate.class).setProvider(localDateProvider);
-	    
-	    modelMapper.addMappings(new PropertyMap<TaskDto, Task>() {
-	        @Override
-	        protected void configure() {
-	            when(Conditions.isNull()).skip().setRealStartTime(null);
-	            when(Conditions.isNull()).skip().setRealEndTime(null);
-	           
-	        }
-	    });
-	  
+
 		return modelMapper;
-	}
-
-	@Bean
-	public ApiListingResource apiListingResource() {
-		return new ApiListingResource();
-	}
-
-	@Bean
-	public SwaggerSerializers swaggerSerializers() {
-		return new SwaggerSerializers();
 	}
 
 	// add for swagger
 	@Bean
 	public Docket newsApi() {
 
-		return new Docket(DocumentationType.SWAGGER_2).groupName("tasks").apiInfo(apiInfo()).select()
+		return new Docket(DocumentationType.SWAGGER_2).groupName("Task Manager").apiInfo(apiInfo()).select()
 				.apis(RequestHandlerSelectors.any()).paths(PathSelectors.any()).build();
 	}
 

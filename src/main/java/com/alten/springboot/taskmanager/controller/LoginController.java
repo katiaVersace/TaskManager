@@ -30,33 +30,35 @@ public class LoginController implements ILoginController {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	private @Context HttpServletRequest request;
+
 
 	@Override
-	public EmployeeDto login(@FormParam("username") String username, @FormParam("password") String password) {
+	public EmployeeDto login(@FormParam("username") String username, @FormParam("password") String password, HttpServletRequest request) {
 
 		UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(username, password);
 		try {
 			Authentication auth = authManager.authenticate(authReq);
-
-			SecurityContext sc = SecurityContextHolder.getContext();
+		SecurityContext sc = SecurityContextHolder.getContext();
 			sc.setAuthentication(auth);
+
 			HttpSession session = request.getSession(true);
 
 			EmployeeDto theUser = modelMapper.map(employeeService.findByUserName(username), EmployeeDto.class);
 
 			session.setAttribute("user", theUser);
+
 			session.setAttribute("SPRING_SECURITY_CONTEXT", sc);
 
 			return theUser;
 		} catch (Exception ex) {
+			//ex.printStackTrace();
 			return null;
 		}
 
 	}
 
 	@Override
-	public String logout() {
+	public String logout(HttpServletRequest request) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null) {
 			new SecurityContextLogoutHandler().logout(request, null, auth);

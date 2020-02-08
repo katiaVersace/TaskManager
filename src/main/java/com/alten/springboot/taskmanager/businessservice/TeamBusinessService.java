@@ -74,11 +74,13 @@ public class TeamBusinessService implements ITeamBusinessService {
         teamDataService.deleteAll();
     }
 
+
+
     @Override
     public String randomPopulation(String start_date, String end_date, int teams_size, int employees_size,
                                    int tasks_size, int task_max_duration) {
 
-        // input
+// input
         LocalDate start = LocalDate.parse(start_date);
         LocalDate end = LocalDate.parse(end_date);
 
@@ -137,22 +139,14 @@ public class TeamBusinessService implements ITeamBusinessService {
                     return task;
                 }).collect(Collectors.toList());
 
-
         // assign at least 1 task for each employee
-        IntStream.range(0, employees.size()).parallel()
-                .forEach(task_index -> {
-                            Task currentTask = tasks.get(task_index);
-                            Employee currentEmployee = employees.get(task_index);
-                            currentTask.setEmployee(currentEmployee);
-                            currentEmployee.getTasks().add(currentTask);
-                            currentTask = taskDataService.save(currentTask);
-                            tasks.set(task_index, currentTask);
-                            if (currentEmployee.getTasks().size() >= 5) {
-
-                                currentEmployee.setTopEmployee(true);
-
-                            }
-                            employees.set(employees.indexOf(currentEmployee), employeeDataService.update(currentEmployee));
+        IntStream.range(0, employees.size())
+                .forEach(i -> {
+                            Task currentTask = tasks.get(i);
+                            Employee currentEmployee = employees.get(i);
+                            assignTaskToEmployee(currentTask, currentEmployee);
+                            tasks.set(i, taskDataService.save(currentTask));
+                            employees.set(i, employeeDataService.update(currentEmployee));
                         }
                 );
 
@@ -192,7 +186,8 @@ public class TeamBusinessService implements ITeamBusinessService {
         long days_max = ChronoUnit.DAYS.between(start, end) + 1;
 
         // sort employees in  base alla loro disponibilità nel periodo del task
-        List<Employee> ordered_employees = team.getEmployees().stream().collect(Collectors.toList());
+        List<Employee> ordered_employees = new ArrayList<>();
+        ordered_employees.addAll(team.getEmployees());
         Collections.sort(ordered_employees, Comparator.comparingInt(e -> getTasksInPeriod(e, task.getExpectedStartTime(), task.getExpectedEndTime()).size()));
 
         List<Task> visitedTasks = new ArrayList<Task>();
@@ -256,7 +251,7 @@ public class TeamBusinessService implements ITeamBusinessService {
         // per non assegnare tutti i task al primo impiegato
         Collections.shuffle(employees);
         AtomicBoolean scheduled = new AtomicBoolean(false);
-        employees.parallelStream().filter(employee -> EmployeeBusinessService.employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime()))
+        employees.stream().filter(employee -> EmployeeBusinessService.employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime()))
                 .findFirst().ifPresent(employee -> {
             assignTaskToEmployee(task, employee);
             taskDataService.save(task);

@@ -4,9 +4,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 
+import com.alten.springboot.taskmanager.config.PrincipalUser;
+import com.alten.springboot.taskmanager.model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,14 +17,15 @@ import com.alten.springboot.taskmanager.dto.AvailabilityByEmployeeInputDto;
 import com.alten.springboot.taskmanager.dto.EmployeeDto;
 import com.alten.springboot.taskmanager.dto.RoleDto;
 import com.alten.springboot.taskmanager.dto.TaskDto;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Component
+
 public class EmployeeController implements IEmployeeController {
 
 	@Autowired
 	private IEmployeeBusinessService employeeService;
 
-	private @Context HttpServletRequest request;
 
 	@Override
 	public List<EmployeeDto> getEmployees() {
@@ -33,15 +34,15 @@ public class EmployeeController implements IEmployeeController {
 	}
 
 	@Override
-	public EmployeeDto getEmployee(@PathParam("employeeId") int employeeId) {
+	public EmployeeDto getEmployee( int employeeId) {
 		EmployeeDto theEmployee = employeeService.findById(employeeId);
 
 		return theEmployee;
 	}
 
 	@Override
-	public EmployeeDto addEmployee(@PathParam("admin") int admin, @RequestBody EmployeeDto theEmployee) {
-		
+	public EmployeeDto addEmployee(int admin, EmployeeDto theEmployee) {
+
 		theEmployee.setId(0); // cioè inserisco, perche provo ad aggiornare ma l'id 0 non esiste
 		
 		RoleDto employeeRole = new RoleDto();
@@ -66,18 +67,19 @@ public class EmployeeController implements IEmployeeController {
 	}
 
 	@Override
-	public String deleteEmployee(@PathParam("employeeId") String employeeId) {
+	public String deleteEmployee( String employeeId, HttpServletRequest request) {
+
 
 		employeeService.delete(Integer.parseInt(employeeId));
+		int userId= ((PrincipalUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 
-		HttpSession session = request.getSession();
-		int userId = ((EmployeeDto) session.getAttribute("user")).getId();
 		if (Integer.parseInt(employeeId) == userId) {
+
 			SecurityContextHolder.clearContext();
-			if (session != null) {
-				session.invalidate();
+			if (request.getSession() != null) {
+				request.getSession().invalidate();
 			}
-			return "redirect:/logout";
+			return "redirect:/auth/logout";
 		} else
 			return "Deleted employee with id: " + employeeId;
 

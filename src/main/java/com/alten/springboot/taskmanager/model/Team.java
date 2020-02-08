@@ -1,19 +1,12 @@
 package com.alten.springboot.taskmanager.model;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "team")
@@ -27,10 +20,11 @@ public class Team {
 	@Column(name = "name", nullable = false)
 	private String name;
 
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany( fetch = FetchType.EAGER)
 	@JoinTable(name = "employees_teams", joinColumns = { @JoinColumn(name = "team_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "employee_id") }, uniqueConstraints = @UniqueConstraint(columnNames = { "team_id",
 					"employee_id" }))
+
 	private Set<Employee> employees;
 
 	@Column(name = "version", nullable = false)

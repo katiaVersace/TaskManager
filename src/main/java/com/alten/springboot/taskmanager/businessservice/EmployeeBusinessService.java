@@ -76,6 +76,7 @@ public class EmployeeBusinessService implements IEmployeeBusinessService {
     public void delete(int employeeId) {
         Employee employee = employeeDataService.findById(employeeId);
         employee.getTasks().parallelStream().forEach(t -> t.setEmployee(null));
+        employee.getTeams().parallelStream().forEach(t->t.getEmployees().remove(employee));
         employeeDataService.delete(employeeId);
     }
 

@@ -61,12 +61,18 @@ public class Employee {
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Task> tasks;
 
+
+
+	@ManyToMany(mappedBy = "employees")
+	private List<Team> teams ;
+
 	@Column(name = "version", nullable = false)
 	private int version;
 
 	public Employee() {
 		roles = new ArrayList<Role>();
 		tasks = new ArrayList<Task>();
+		teams = new ArrayList<Team>();
 	}
 
 	public Employee(String userName, String password, String firstName, String lastName, String email,
@@ -79,6 +85,7 @@ public class Employee {
 		this.topEmployee = topEmployee;
 		roles = new ArrayList<Role>();
 		tasks = new ArrayList<Task>();
+		teams = new ArrayList<Team>();
 	}
 
 	public Employee(String userName, String password, String firstName, String lastName, String email,
@@ -149,7 +156,7 @@ public class Employee {
 		this.topEmployee = topEmployee;
 	}
 
-	public Collection<Role> getRoles() {
+	public List<Role> getRoles() {
 		if (roles == null)
 			roles = new ArrayList<Role>();
 		return roles;
@@ -165,6 +172,14 @@ public class Employee {
 
 	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
+	}
+
+	public List<Team> getTeams() {
+		return teams;
+	}
+
+	public void setTeams(List<Team> teams) {
+		this.teams = teams;
 	}
 
 	public int getVersion() {
