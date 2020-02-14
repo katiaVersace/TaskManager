@@ -83,9 +83,7 @@ public class TaskBusinessService implements ITaskBusinessService {
     public boolean update(TaskDto taskDto) {
 
         Task task = modelMapper.map(taskDto, Task.class);
-        //task.setRealStartTime(LocalDate.parse(taskDto.getRealStartTime()));
-        //task.setRealEndTime(LocalDate.parse(taskDto.getRealEndTime()));
-        if (!checkDate(task)) {
+         if (!checkDate(task)) {
             return false;
         }
         Task result = taskDataService.update(task);

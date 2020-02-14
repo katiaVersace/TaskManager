@@ -193,7 +193,7 @@ public class TeamBusinessService implements ITeamBusinessService {
         List<Task> visitedTasks = new ArrayList<Task>();
         HashMap<Task, Employee> oldAssignments = new HashMap<Task, Employee>();
         if (checkNoSolution(task.getExpectedStartTime(), task.getExpectedEndTime(), ordered_employees)
-                || !assignTaskToTeam(task, ordered_employees, visitedTasks, oldAssignments)) {
+                || !assignTaskToTeam(task, team.getEmployees(), visitedTasks, oldAssignments)) {
             System.out.println("Impossible to assign the task");
             return null;
         } else {
@@ -204,12 +204,13 @@ public class TeamBusinessService implements ITeamBusinessService {
 
                 if (oldEmployee != null) {
                     employeesToSave.add(oldEmployee);
-                    employeesToSave.add(taskInSolution.getEmployee());
+
 
                 } else {
                     theTaskDto = modelMapper.map(savedTask, TaskDto.class);
-                    employeesToSave.add(taskInSolution.getEmployee());
+
                 }
+                employeesToSave.add(taskInSolution.getEmployee());
 
             }
             employeesToSave.forEach(e -> employeeDataService.save(e));
@@ -295,7 +296,7 @@ public class TeamBusinessService implements ITeamBusinessService {
         return startInclusive.plusDays(rn.nextInt((int) daysMax));
     }
 
-    public boolean assignTaskToTeam(Task task, List<Employee> team, List<Task> visitedTasks,
+    public boolean assignTaskToTeam(Task task, Set<Employee> team, List<Task> visitedTasks,
                                     HashMap<Task, Employee> oldAssignments) {
 
         visitedTasks.add(task);
@@ -320,7 +321,7 @@ public class TeamBusinessService implements ITeamBusinessService {
         return false;
     }
 
-    public boolean reassign(Employee employee, Task task, List<Task> visitedTasks, List<Employee> team, HashMap<Task, Employee> oldAssignments, Employee oldEmployee) {
+    public boolean reassign(Employee employee, Task task, List<Task> visitedTasks, Set<Employee> team, HashMap<Task, Employee> oldAssignments, Employee oldEmployee) {
 
         List<Task> tasksInPeriod = getTasksInPeriod(employee, task.getExpectedStartTime(),
                 task.getExpectedEndTime());

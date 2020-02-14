@@ -56,7 +56,7 @@ public class Employee {
 	private List<Role> roles;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "employee", cascade = { CascadeType.PERSIST, CascadeType.REFRESH,
+	@OneToMany(mappedBy = "employee", cascade = { CascadeType.MERGE, CascadeType.REFRESH,
 			CascadeType.REMOVE }, orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Task> tasks;

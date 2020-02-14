@@ -22,3 +22,4 @@ spring:
         show_sql: false
         hbm2ddl:
           auto: create
+
