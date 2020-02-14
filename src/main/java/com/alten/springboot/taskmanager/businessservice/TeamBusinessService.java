@@ -213,6 +213,9 @@ public class TeamBusinessService implements ITeamBusinessService {
                 employeesToSave.add(taskInSolution.getEmployee());
 
             }
+
+
+
             employeesToSave.forEach(e -> employeeDataService.save(e));
 
             System.out.println("Solution: ");
@@ -328,26 +331,27 @@ public class TeamBusinessService implements ITeamBusinessService {
 
         // forzatamente assegno il task all'impiegato e cerco di spostare i task di intralcio
         assignTaskToEmployee(task, employee);
-        boolean atLeastOneFailed = false;
+        AtomicBoolean atLeastOneFailed = new AtomicBoolean(false);
 
-        for (Task taskToRearrange : tasksInPeriod) {
+        tasksInPeriod.stream().forEach(taskToRearrange ->{
             if (visitedTasks.contains(taskToRearrange)) {
-                atLeastOneFailed = true;
-                break;
+                atLeastOneFailed.set(true);
+                return;
             }
             HashMap<Task, Employee> oldAssignmentsForBranch = new HashMap<Task, Employee>();
             if (taskInProgress(taskToRearrange)
                     || !assignTaskToTeam(taskToRearrange, team, visitedTasks, oldAssignmentsForBranch)) {
-                atLeastOneFailed = true;
-                break;
+                atLeastOneFailed.set(true);
+                return;
             } else {
                 // tutti i branch hanno restituito true quindi faccio merge dei vecchi assegnamenti dei task in quei branch
                 oldAssignments.putAll(oldAssignmentsForBranch);
             }
-        }
+
+        });
 
         //se almeno uno degli assegnamenti dei task di intralcio fallisce, ripristino
-        if (atLeastOneFailed) {
+        if (atLeastOneFailed.get()) {
 
             assignTaskToEmployee(task, oldEmployee);
             // ripristino i task dei branch che hanno restituito true
