@@ -47,11 +47,8 @@ public class TeamBusinessService implements ITeamBusinessService {
     @Override
     public TeamDto findById(int teamId) {
         Team team = teamDataService.findById(teamId);
-        TeamDto teamDto = null;
-        if (team != null) {
-            teamDto = modelMapper.map(team, TeamDto.class);
-        }
-        return teamDto;
+        return (team != null) ? modelMapper.map(team, TeamDto.class) : null;
+
     }
 
     @Override
@@ -75,15 +72,12 @@ public class TeamBusinessService implements ITeamBusinessService {
     }
 
 
-
     @Override
     public String randomPopulation(String start_date, String end_date, int teams_size, int employees_size,
                                    int tasks_size, int task_max_duration) {
 
-// input
-        LocalDate start = LocalDate.parse(start_date);
-        LocalDate end = LocalDate.parse(end_date);
-
+        // input
+        LocalDate start = LocalDate.parse(start_date), end = LocalDate.parse(end_date);
 
         // Check input
         long days_max = ChronoUnit.DAYS.between(start, end) + 1;
@@ -126,11 +120,9 @@ public class TeamBusinessService implements ITeamBusinessService {
         }
 
         // create Tasks
-        Random rn = new Random();
-
         List<Task> tasks = IntStream.range(0, tasks_size).parallel()
                 .mapToObj(i -> {
-                    int duration = rn.nextInt(task_max_duration) + 1;
+                    int duration = new Random().nextInt(task_max_duration) + 1;
                     String generatedString = RandomStringUtils.randomAlphabetic(NRANDOMCHARS).toUpperCase();
                     LocalDate endMinusDuration = end.plusDays(-duration);
                     LocalDate expectedStartTime = between(start, endMinusDuration);
@@ -176,14 +168,10 @@ public class TeamBusinessService implements ITeamBusinessService {
 
         Task task = modelMapper.map(theTaskDto, Task.class);
         Team team = teamDataService.findById(team_id);
-
-        LocalDate start = LocalDate.parse(start_date);
-        LocalDate end = LocalDate.parse(end_date);
+        LocalDate start = LocalDate.parse(start_date), end = LocalDate.parse(end_date);
 
         if (!TaskBusinessService.checkDate(task))
             return null;
-
-        long days_max = ChronoUnit.DAYS.between(start, end) + 1;
 
         // sort employees in  base alla loro disponibilità nel periodo del task
         List<Employee> ordered_employees = new ArrayList<>();
@@ -198,33 +186,26 @@ public class TeamBusinessService implements ITeamBusinessService {
             return null;
         } else {
             List<Employee> employeesToSave = new ArrayList<Employee>();
+
             for (Task taskInSolution : visitedTasks) {
                 Task savedTask = taskDataService.save(taskInSolution);
                 Employee oldEmployee = oldAssignments.get(taskInSolution);
 
                 if (oldEmployee != null) {
                     employeesToSave.add(oldEmployee);
-
-
                 } else {
                     theTaskDto = modelMapper.map(savedTask, TaskDto.class);
-
                 }
-                employeesToSave.add(taskInSolution.getEmployee());
 
+                employeesToSave.add(taskInSolution.getEmployee());
             }
 
-
-
             employeesToSave.forEach(e -> employeeDataService.save(e));
-
             System.out.println("Solution: ");
             visitedTasks.stream().forEach(taskInSolution ->
                     System.out.println(String.format("%s -> %s", taskInSolution.getDescription(), taskInSolution.getEmployee().getUserName()))
             );
-
-            LocalDate final_start = start.minusDays(10);
-            LocalDate final_end = end.plusDays(10);
+            LocalDate final_start = start.minusDays(10), final_end = end.plusDays(10);
             long final_days_max = (ChronoUnit.DAYS.between(final_start, final_end)) + 1;
             System.out.println("New scheduling:\n" + printDays(final_start, final_days_max));
             team.getEmployees().stream().map(e -> EmployeeBusinessService.printEmployeeScheduling(e, final_days_max, final_start, final_end)).forEach(System.out::println);
@@ -294,9 +275,8 @@ public class TeamBusinessService implements ITeamBusinessService {
 
     public LocalDate between(LocalDate startInclusive, LocalDate endInclusive) {
 
-        Random rn = new Random();
         long daysMax = (ChronoUnit.DAYS.between(startInclusive, endInclusive)) + 1;
-        return startInclusive.plusDays(rn.nextInt((int) daysMax));
+        return startInclusive.plusDays(new Random().nextInt((int) daysMax));
     }
 
     public boolean assignTaskToTeam(Task task, Set<Employee> team, List<Task> visitedTasks,
@@ -320,7 +300,6 @@ public class TeamBusinessService implements ITeamBusinessService {
         if (result.isPresent()) return true;
 
         visitedTasks.remove(task);
-
         return false;
     }
 
@@ -333,7 +312,7 @@ public class TeamBusinessService implements ITeamBusinessService {
         assignTaskToEmployee(task, employee);
         AtomicBoolean atLeastOneFailed = new AtomicBoolean(false);
 
-        tasksInPeriod.stream().forEach(taskToRearrange ->{
+        tasksInPeriod.stream().forEach(taskToRearrange -> {
             if (visitedTasks.contains(taskToRearrange)) {
                 atLeastOneFailed.set(true);
                 return;
@@ -362,23 +341,22 @@ public class TeamBusinessService implements ITeamBusinessService {
             });
             oldAssignments.clear();
             return false;
-
         } else {
             oldAssignments.put(task, oldEmployee);
             return true;
         }
     }
 
-    public void assignTaskToEmployee(Task task, Employee employee) {
+    public static void assignTaskToEmployee(Task task, Employee employee) {
         if (task.getEmployee() != null) {
             task.getEmployee().getTasks().remove(task);
-            if (task.getEmployee().getTasks().size() < 5) {
+            if (task.getEmployee().getTasks().size() < 5 && task.getEmployee().isTopEmployee()) {
                 task.getEmployee().setTopEmployee(false);
             }
         }
         if (employee != null) {
             employee.getTasks().add(task);
-            if (employee.getTasks().size() >= 5) {
+            if (employee.getTasks().size() >= 5 && !employee.isTopEmployee()) {
                 employee.setTopEmployee(true);
             }
         }
@@ -413,30 +391,6 @@ public class TeamBusinessService implements ITeamBusinessService {
             currentDay = currentDay.plusDays(1);
         }
         return false;
-    }
-
-    public String toString(int i, int radix) { // SORGENTE RICAVATO dal toString di java > Integer.toString(n, 16);
-        String SYMBOLS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
-        char[] digits = SYMBOLS.toCharArray();
-        char[] buf = new char[33];
-        boolean negative = (i < 0);
-        int charPos = 32;
-
-        if (!negative) {
-            i = -i;
-        }
-
-        while (i <= -radix) {
-            buf[charPos--] = digits[-(i % radix)];
-            i = i / radix;
-        }
-        buf[charPos] = digits[-i];
-
-        if (negative) {
-            buf[--charPos] = '-';
-        }
-
-        return new String(buf, charPos, (33 - charPos));
     }
 
     private String printFreeEmployees(LocalDate start, LocalDate end, long scheduleSize, List<Employee> employees) {

@@ -35,12 +35,7 @@ public class EmployeeBusinessService implements IEmployeeBusinessService {
     public EmployeeDto findByUserName(String userName) {
 
         Employee employee = employeeDataService.findByUserName(userName);
-        EmployeeDto employeeDto = null;
-        if (employee != null) {
-            employeeDto = modelMapper.map(employee, EmployeeDto.class);
-        }
-        return employeeDto;
-
+        return (employee != null) ? modelMapper.map(employee, EmployeeDto.class) : null;
     }
 
     @Override
@@ -53,7 +48,7 @@ public class EmployeeBusinessService implements IEmployeeBusinessService {
     public EmployeeDto findById(int employeeId) {
 
         Employee employee = employeeDataService.findById(employeeId);
-        return modelMapper.map(employee, EmployeeDto.class);
+        return (employee != null) ? modelMapper.map(employee, EmployeeDto.class) : null;
 
     }
 
@@ -74,9 +69,10 @@ public class EmployeeBusinessService implements IEmployeeBusinessService {
 
     @Override
     public void delete(int employeeId) {
+
         Employee employee = employeeDataService.findById(employeeId);
         employee.getTasks().parallelStream().forEach(t -> t.setEmployee(null));
-        employee.getTeams().parallelStream().forEach(t->t.getEmployees().remove(employee));
+        employee.getTeams().parallelStream().forEach(t -> t.getEmployees().remove(employee));
         employeeDataService.delete(employeeId);
     }
 
@@ -89,12 +85,10 @@ public class EmployeeBusinessService implements IEmployeeBusinessService {
 
     @Override
     public String getAvailabilityByEmployee(int employeeId, String start_date, String end_date) {
-        Employee employee = employeeDataService.findById(employeeId);
-        LocalDate start = LocalDate.parse(start_date);
-        LocalDate end = LocalDate.parse(end_date);
-        long schedule_size = ChronoUnit.DAYS.between(start, end) + 1;
 
-        return printEmployeeScheduling(employee, schedule_size, start, end);
+        Employee employee = employeeDataService.findById(employeeId);
+        LocalDate start = LocalDate.parse(start_date), end = LocalDate.parse(end_date);
+        return printEmployeeScheduling(employee, ChronoUnit.DAYS.between(start, end) + 1, start, end);
 
     }
 
@@ -124,9 +118,9 @@ public class EmployeeBusinessService implements IEmployeeBusinessService {
     }
 
     public static boolean betweenTwoDate(LocalDate toCheck, LocalDate start, LocalDate end) {
-        boolean result = (toCheck.isAfter(start) && toCheck.isBefore(end)) || toCheck.equals(start)
+
+        return (toCheck.isAfter(start) && toCheck.isBefore(end)) || toCheck.equals(start)
                 || toCheck.equals(end);
-        return result;
     }
 
     static boolean employeeAvailable(Employee e, LocalDate startTask, LocalDate endTask) {
@@ -137,9 +131,8 @@ public class EmployeeBusinessService implements IEmployeeBusinessService {
                 || betweenTwoDate(t.getExpectedEndTime(), startTask, endTask))
                 .findFirst();
 
-        if (result.isPresent()) return false;
+        return !result.isPresent();
 
-        return true;
     }
 
 }
