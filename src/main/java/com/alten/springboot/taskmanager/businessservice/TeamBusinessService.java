@@ -95,6 +95,7 @@ public class TeamBusinessService implements ITeamBusinessService {
                     return employee;
                 }).collect(Collectors.toList());
 
+        //employees.parallelStream().forEach(i -> employeeDataService.save(i));
 
         // create Teams
         List<Team> teams = IntStream.range(0, teams_size).parallel()
@@ -236,7 +237,7 @@ public class TeamBusinessService implements ITeamBusinessService {
         // per non assegnare tutti i task al primo impiegato
         Collections.shuffle(employees);
         AtomicBoolean scheduled = new AtomicBoolean(false);
-        employees.stream().filter(employee -> EmployeeBusinessService.employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime()))
+        employees.parallelStream().filter(employee -> EmployeeBusinessService.employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime()))
                 .findFirst().ifPresent(employee -> {
             assignTaskToEmployee(task, employee);
             taskDataService.save(task);
