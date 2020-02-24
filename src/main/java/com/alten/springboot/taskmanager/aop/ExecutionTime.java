@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExecutionTime {
 
-    @Around("execution(* com.alten.springboot.taskmanager.controller.ITeamController.assignTaskToTeam(..))")
+    @Around("execution(* com.alten.springboot.taskmanager.controller.ITeamController.assignTaskToTeam(..)) || execution(* com.alten.springboot.taskmanager.controller.ITeamController.randomPopulation(..))")
     public Object calculateExecutionTime(ProceedingJoinPoint theProcJp) throws Throwable{
 
         long begin = System.currentTimeMillis();
