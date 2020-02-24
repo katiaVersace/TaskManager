@@ -11,7 +11,9 @@ public interface ITaskDataService {
 	public Task findById(int taskId);
 	
 	public Task save(Task task);
-	
+
+	public List<Task> saveAll(List<Task> tasks);
+
 	public Task update(Task task);
 	
 	public void delete(int taskId);

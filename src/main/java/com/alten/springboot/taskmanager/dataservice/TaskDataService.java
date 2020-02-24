@@ -33,6 +33,10 @@ public class TaskDataService implements ITaskDataService {
 
 	}
 
+	@Override
+	public List<Task> saveAll(List<Task> tasks) {
+		return taskDao.saveAll(tasks);
+	}
 
 
 	@Override

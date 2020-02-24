@@ -11,6 +11,8 @@ public interface ITeamDataService {
 	public Team findById(int teamId);
     
 	public Team save(Team team);
+
+	public List<Team> saveAll(List<Team> teams);
     
 	public Team update(Team team);
     

@@ -81,6 +81,12 @@ public class EmployeeDataService implements IEmployeeDataService {
 
     @Override
     @Transactional
+    public List<Employee> saveAll(List<Employee> employees) {
+        return employeeDao.saveAll(employees);
+    }
+
+    @Override
+    @Transactional
     public Employee update(Employee newEmployee) {
         Optional<Employee> result = employeeDao.findById(newEmployee.getId());
 

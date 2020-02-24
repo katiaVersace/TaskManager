@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -91,34 +92,34 @@ public class TeamBusinessService implements ITeamBusinessService {
                     String generatedString = RandomStringUtils.randomAlphabetic(NRANDOMCHARS).toUpperCase();
                     Employee employee = new Employee("EMP_" + generatedString, generatedString, "Name_" + generatedString,
                             "LastName_" + generatedString, generatedString + "@alten.it", false);
-                    employee = employeeDataService.save(employee);
                     return employee;
                 }).collect(Collectors.toList());
 
-        //employees.parallelStream().forEach(i -> employeeDataService.save(i));
+
 
         // create Teams
         List<Team> teams = IntStream.range(0, teams_size).parallel()
                 .mapToObj(i -> {
                     String generatedString = RandomStringUtils.randomAlphabetic(NRANDOMCHARS).toUpperCase();
                     Team team = new Team("TEAM_" + generatedString);
-                    team = teamDataService.save(team);
                     return team;
                 }).collect(Collectors.toList());
 
 
-        // assign team to employees
 
-        int team_index = 0;
-        for (Employee employee : employees) {
-            Team currentTeam = teams.get(team_index);
-            currentTeam.getEmployees().add(employee);
-            currentTeam = teamDataService.update(currentTeam);
-            teams.set(team_index, currentTeam);
-            team_index++;
-            if (team_index == teams_size)
-                team_index = 0;
+        // assign employees to teams balancing the teams
+        int employees_for_team = employees_size / teams_size;
+        AtomicInteger difference = new AtomicInteger(employees_size % teams_size), current_emp = new AtomicInteger();
+
+        teams.stream().forEach(t-> {
+            IntStream.range(current_emp.get(), current_emp.get() + employees_for_team + difference.get())
+
+                    .forEach(i -> t.getEmployees().add(employees.get(i)));
+                    current_emp.addAndGet(employees_for_team + difference.get());
+                    difference.set(0);
         }
+        );
+
 
         // create Tasks
         List<Task> tasks = IntStream.range(0, tasks_size).parallel()
@@ -129,31 +130,35 @@ public class TeamBusinessService implements ITeamBusinessService {
                     LocalDate expectedStartTime = between(start, endMinusDuration);
                     LocalDate expectedEndTime = expectedStartTime.plusDays(duration - 1);
                     Task task = new Task(generatedString, expectedStartTime, null, expectedEndTime, null);
+
                     return task;
                 }).collect(Collectors.toList());
 
         // assign at least 1 task for each employee
         IntStream.range(0, employees.size())
                 .forEach(i -> {
-                            Task currentTask = tasks.get(i);
-                            Employee currentEmployee = employees.get(i);
-                            assignTaskToEmployee(currentTask, currentEmployee);
-                            tasks.set(i, taskDataService.save(currentTask));
-                            employees.set(i, employeeDataService.update(currentEmployee));
-                        }
+                            assignTaskToEmployee(tasks.get(i), employees.get(i));
+                    System.out.println(tasks.get(i).getDescription()+" -> "+ employees.get(i).getUserName());
+                            }
                 );
 
         // assign remaining task
-        List<Task> remainingTasks = new ArrayList<Task>(tasks.subList(employees.size(), tasks.size()));
+        List<Task> remainingTasks = new ArrayList<>(tasks.subList(employees.size(), tasks.size()));
+
 
         boolean availability = true;
         while (remainingTasks.size() != 0 && availability) {
             if (assignTaskRandom(remainingTasks.get(0), employees, start, end)) {
+                System.out.println(remainingTasks.get(0).getDescription()+" -> "+ remainingTasks.get(0).getEmployee().getUserName());
                 remainingTasks.remove(0);
             } else {
                 availability = false;
             }
         }
+
+        employeeDataService.saveAll(employees);
+        teamDataService.saveAll(teams);
+        taskDataService.saveAll(tasks);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Scheduling:\n" + printDays(start, days_max) + "\n");
@@ -237,12 +242,10 @@ public class TeamBusinessService implements ITeamBusinessService {
         // per non assegnare tutti i task al primo impiegato
         Collections.shuffle(employees);
         AtomicBoolean scheduled = new AtomicBoolean(false);
-        employees.parallelStream().filter(employee -> EmployeeBusinessService.employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime()))
+        employees.stream().filter(employee -> EmployeeBusinessService.employeeAvailable(employee, task.getExpectedStartTime(), task.getExpectedEndTime()))
                 .findFirst().ifPresent(employee -> {
             assignTaskToEmployee(task, employee);
-            taskDataService.save(task);
             scheduled.set(true);
-            employees.set(employees.indexOf(employee), employeeDataService.update(employee));
         });
         if (scheduled.get()) {
             return true;
@@ -254,8 +257,8 @@ public class TeamBusinessService implements ITeamBusinessService {
             task.setExpectedStartTime(availability);
             task.setExpectedEndTime(availability);
             assignTaskToEmployee(task, employee);
-            taskDataService.save(task);
-            employees.set(employees.indexOf(employee), employeeDataService.update(employee));
+//            taskDataService.save(task);
+//            employees.set(employees.indexOf(employee), employeeDataService.update(employee));
             scheduled.set(true);
         });
 

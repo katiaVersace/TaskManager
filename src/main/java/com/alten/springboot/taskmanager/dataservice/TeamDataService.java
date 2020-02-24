@@ -43,6 +43,12 @@ public class TeamDataService implements ITeamDataService {
 
 	@Override
 	@Transactional
+	public List<Team> saveAll(List<Team> teams) {
+		return teamDao.saveAll(teams);
+	}
+
+	@Override
+	@Transactional
 	public Team update(Team newTeam) {
 
 		Optional<Team> result = teamDao.findById(newTeam.getId());

@@ -16,6 +16,8 @@ public interface IEmployeeDataService extends UserDetailsService {
 
 	public Employee save(Employee employee);
 
+	public List<Employee> saveAll(List<Employee> employees);
+
 	public Employee update(Employee employee);
 
 	public void delete(int employeeId);
