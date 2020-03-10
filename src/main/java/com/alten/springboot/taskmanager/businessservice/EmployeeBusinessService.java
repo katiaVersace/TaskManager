@@ -31,6 +31,49 @@ public class EmployeeBusinessService implements IEmployeeBusinessService {
     @Autowired
     private ModelMapper modelMapper;
 
+    public static String printEmployeeScheduling(Employee employee, long schedule_size, LocalDate start, LocalDate end) {
+
+        String[] schedule = new String[(int) schedule_size];
+        Arrays.fill(schedule, "__");
+
+        employee.getTasks().stream().forEach(task -> {
+            LocalDate taskStartDate = task.getExpectedStartTime(), taskEndDate = task.getExpectedEndTime();
+            // check on task start and end because a task can end over the end of the period specified or start before
+            taskStartDate = (taskStartDate.isBefore(start)) ? start : taskStartDate;
+            taskEndDate = (taskEndDate.isAfter(end)) ? end : taskEndDate;
+            long taskStart = ChronoUnit.DAYS.between(start, taskStartDate), taskDuration = ChronoUnit.DAYS.between(taskStartDate, taskEndDate) + 1;
+            String stringToPrint = task.getDescription();
+            stringToPrint = (stringToPrint.length() < 2) ? "0" + stringToPrint : stringToPrint;
+            String finalStringToPrint = stringToPrint;
+            IntStream.range((int) taskStart, (int) (taskStart + taskDuration))
+                    .forEach(i -> schedule[i] = finalStringToPrint);
+        });
+
+        StringBuilder sb = new StringBuilder();
+        Stream.of(schedule).forEach(availability -> sb.append(availability + "  "));
+        sb.append(employee.getUserName());
+        return sb.toString();
+
+    }
+
+    public static boolean betweenTwoDate(LocalDate toCheck, LocalDate start, LocalDate end) {
+
+        return (toCheck.isAfter(start) && toCheck.isBefore(end)) || toCheck.equals(start)
+                || toCheck.equals(end);
+    }
+
+    static boolean employeeAvailable(Employee e, LocalDate startTask, LocalDate endTask) {
+
+        Optional<Task> result = e.getTasks().stream().filter(t -> betweenTwoDate(startTask, t.getExpectedStartTime(), t.getExpectedEndTime())
+                || betweenTwoDate(endTask, t.getExpectedStartTime(), t.getExpectedEndTime())
+                || betweenTwoDate(t.getExpectedStartTime(), startTask, endTask)
+                || betweenTwoDate(t.getExpectedEndTime(), startTask, endTask))
+                .findFirst();
+
+        return !result.isPresent();
+
+    }
+
     @Override
     public EmployeeDto findByUserName(String userName) {
 
@@ -89,49 +132,6 @@ public class EmployeeBusinessService implements IEmployeeBusinessService {
         Employee employee = employeeDataService.findById(employeeId);
         LocalDate start = LocalDate.parse(start_date), end = LocalDate.parse(end_date);
         return printEmployeeScheduling(employee, ChronoUnit.DAYS.between(start, end) + 1, start, end);
-
-    }
-
-    public static String printEmployeeScheduling(Employee employee, long schedule_size, LocalDate start, LocalDate end) {
-
-        String[] schedule = new String[(int) schedule_size];
-        Arrays.fill(schedule, "__");
-
-        employee.getTasks().stream().forEach(task -> {
-            LocalDate taskStartDate = task.getExpectedStartTime(), taskEndDate = task.getExpectedEndTime();
-            // check on task start and end because a task can end over the end of the period specified or start before
-            taskStartDate = (taskStartDate.isBefore(start)) ? start : taskStartDate;
-            taskEndDate = (taskEndDate.isAfter(end)) ? end : taskEndDate;
-            long taskStart = ChronoUnit.DAYS.between(start, taskStartDate), taskDuration = ChronoUnit.DAYS.between(taskStartDate, taskEndDate) + 1;
-            String stringToPrint = task.getDescription();
-            stringToPrint = (stringToPrint.length() < 2) ? "0" + stringToPrint : stringToPrint;
-            String finalStringToPrint = stringToPrint;
-            IntStream.range((int) taskStart, (int) (taskStart + taskDuration))
-                    .forEach(i -> schedule[i] = finalStringToPrint);
-        });
-
-        StringBuilder sb = new StringBuilder();
-        Stream.of(schedule).forEach(availability -> sb.append(availability + "  "));
-        sb.append(employee.getUserName());
-        return sb.toString();
-
-    }
-
-    public static boolean betweenTwoDate(LocalDate toCheck, LocalDate start, LocalDate end) {
-
-        return (toCheck.isAfter(start) && toCheck.isBefore(end)) || toCheck.equals(start)
-                || toCheck.equals(end);
-    }
-
-    static boolean employeeAvailable(Employee e, LocalDate startTask, LocalDate endTask) {
-
-        Optional<Task> result = e.getTasks().stream().filter(t -> betweenTwoDate(startTask, t.getExpectedStartTime(), t.getExpectedEndTime())
-                || betweenTwoDate(endTask, t.getExpectedStartTime(), t.getExpectedEndTime())
-                || betweenTwoDate(t.getExpectedStartTime(), startTask, endTask)
-                || betweenTwoDate(t.getExpectedEndTime(), startTask, endTask))
-                .findFirst();
-
-        return !result.isPresent();
 
     }
 

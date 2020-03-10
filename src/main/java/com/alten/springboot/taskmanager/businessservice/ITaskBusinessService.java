@@ -6,16 +6,16 @@ import com.alten.springboot.taskmanager.dto.TaskDto;
 
 public interface ITaskBusinessService {
 
-	public List<TaskDto> findAll();
+    public List<TaskDto> findAll();
 
-	public TaskDto findById(int taskId);
+    public TaskDto findById(int taskId);
 
-	public TaskDto save(TaskDto task);
+    public TaskDto save(TaskDto task);
 
-	public boolean update(TaskDto task);
+    public boolean update(TaskDto task);
 
-	public void delete(int taskId);
+    public void delete(int taskId);
 
-	public List<TaskDto> findByEmployeeId(int employeeId);
+    public List<TaskDto> findByEmployeeId(int employeeId);
 
 }

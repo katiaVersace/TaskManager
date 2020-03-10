@@ -44,11 +44,11 @@ interface IEmployeeController {
             @ApiParam(value = "Employee Id from which employee object will delete from database table", required = true) @PathVariable("employeeId") employeeId: String?, request: HttpServletRequest?): String?
 
     @ApiOperation(value = "View a list of available employees in a Team for a Task", response = MutableList::class)
-    @GetMapping(value = ["/employeesByTeamAndTask/{teamId}"], consumes = ["application/json"], produces = ["application/json"])
+    @PostMapping(value = ["/employeesByTeamAndTask/{teamId}"], consumes = ["application/json"], produces = ["application/json"])
     fun getAvailableEmployeesByTeamAndTask(@ApiParam(value = "Team id object store in database table", required = true) @PathVariable("teamId") teamId: Int,
                                            @ApiParam(value = "Task object store in database table", required = true) @RequestBody theTask: TaskDto?): List<EmployeeDto?>?
 
     @ApiOperation(value = "View availability and tasks for an Employee", response = MutableList::class)
-    @GetMapping(value = ["/availability"], consumes = ["application/json"], produces = ["application/json"])
+    @PostMapping(value = ["/availability"], consumes = ["application/json"], produces = ["application/json"])
     fun getAvailabilityByEmployee(@ApiParam(value = "input", required = true) @RequestBody input: AvailabilityByEmployeeInputDto?): String?
 }

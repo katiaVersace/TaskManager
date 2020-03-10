@@ -15,90 +15,88 @@ import com.alten.springboot.taskmanager.model.Team;
 @Service
 public class TeamDataService implements ITeamDataService {
 
-	@Autowired
-	private TeamRepository teamDao;
+    @Autowired
+    private TeamRepository teamDao;
 
-	@Override
-	@Transactional
-	public List<Team> findAll() {
-		List<Team> teams = teamDao.findAll();
+    @Override
+    @Transactional
+    public List<Team> findAll() {
+        List<Team> teams = teamDao.findAll();
 
-		return teams;
-	}
+        return teams;
+    }
 
-	@Override
-	@Transactional
-	public Team findById(int teamId) {
-		Optional<Team> result = teamDao.findById(teamId);
+    @Override
+    @Transactional
+    public Team findById(int teamId) {
+        Optional<Team> result = teamDao.findById(teamId);
 
-		return result.get();
-	}
+        return result.get();
+    }
 
-	@Override
-	@Transactional
-	public Team save(Team team) {
-		return teamDao.save(team);
+    @Override
+    @Transactional
+    public Team save(Team team) {
+        return teamDao.save(team);
 
-	}
+    }
 
-	@Override
-	@Transactional
-	public List<Team> saveAll(List<Team> teams) {
-		return teamDao.saveAll(teams);
-	}
+    @Override
+    @Transactional
+    public List<Team> saveAll(List<Team> teams) {
+        return teamDao.saveAll(teams);
+    }
 
-	@Override
-	@Transactional
-	public Team update(Team newTeam) {
+    @Override
+    @Transactional
+    public Team update(Team newTeam) {
 
-		Optional<Team> result = teamDao.findById(newTeam.getId());
+        Optional<Team> result = teamDao.findById(newTeam.getId());
 
-		if (result.isPresent()) {
+        if (result.isPresent()) {
 
-			Team oldTeam = result.get();
+            Team oldTeam = result.get();
 
-			// update only if you have the last version
-			int oldVersion = oldTeam.getVersion();
-			if (oldVersion == newTeam.getVersion()) {
+            // update only if you have the last version
+            int oldVersion = oldTeam.getVersion();
+            if (oldVersion == newTeam.getVersion()) {
 
 
-				oldTeam.setVersion(oldVersion + 1);
-				oldTeam.setName(newTeam.getName());
+                oldTeam.setVersion(oldVersion + 1);
+                oldTeam.setName(newTeam.getName());
 
-				oldTeam.setEmployees(newTeam.getEmployees());
+                oldTeam.setEmployees(newTeam.getEmployees());
 
-				return teamDao.save(oldTeam);
+                return teamDao.save(oldTeam);
 
-			}
+            } else {
 
-			else {
+                throw new RuntimeException("You are trying to update an older version of this team, db:" + oldVersion
+                        + ", your object: " + newTeam.getVersion());
 
-				throw new RuntimeException("You are trying to update an older version of this team, db:" + oldVersion
-						+ ", your object: " + newTeam.getVersion());
+            }
+        } else {
+            throw new NullPointerException("Error, team not found in the db");
+        }
+    }
 
-			}
-		} else {
-			throw new NullPointerException("Error, team not found in the db");
-		}
-	}
+    @Override
+    @Transactional
+    public void delete(int teamId) {
+        Optional<Team> result = teamDao.findById(teamId);
+        if (result.isPresent()) {
+            teamDao.deleteById(teamId);
+        } else {
+            throw new NullPointerException("Error, team not found in the db");
+        }
 
-	@Override
-	@Transactional
-	public void delete(int teamId) {
-		Optional<Team> result = teamDao.findById(teamId);
-		if (result.isPresent()) {
-			teamDao.deleteById(teamId);
-		} else {
-			throw new NullPointerException("Error, team not found in the db");
-		}
+    }
 
-	}
 
-	
-	@Override
-	@Transactional
-	public void deleteAll() {
-		teamDao.deleteAll();
-	}
+    @Override
+    @Transactional
+    public void deleteAll() {
+        teamDao.deleteAll();
+    }
 
 }

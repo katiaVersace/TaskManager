@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
-open class TeamController (@Autowired private val teamService: ITeamBusinessService): ITeamController {
+open class TeamController(@Autowired private val teamService: ITeamBusinessService) : ITeamController {
 
     override fun getTeams(): List<TeamDto?>? {
         return teamService!!.findAll()

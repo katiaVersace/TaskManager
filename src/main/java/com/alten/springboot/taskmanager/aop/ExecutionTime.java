@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 public class ExecutionTime {
 
     @Around("execution(* com.alten.springboot.taskmanager.controller.ITeamController.assignTaskToTeam(..)) || execution(* com.alten.springboot.taskmanager.controller.ITeamController.randomPopulation(..))")
-    public Object calculateExecutionTime(ProceedingJoinPoint theProcJp) throws Throwable{
+    public Object calculateExecutionTime(ProceedingJoinPoint theProcJp) throws Throwable {
 
         long begin = System.currentTimeMillis();
         Object result = theProcJp.proceed();
-        long end =System.currentTimeMillis();
+        long end = System.currentTimeMillis();
         long duration = end - begin;
-        System.out.println("Duration: "+ duration*0.001+ " seconds");
+        System.out.println("Duration: " + duration * 0.001 + " seconds");
         return result;
     }
 }

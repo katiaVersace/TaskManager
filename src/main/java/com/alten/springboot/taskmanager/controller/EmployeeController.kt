@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import javax.servlet.http.HttpServletRequest
 
 @Component
-open class EmployeeController (@Autowired private val employeeService: IEmployeeBusinessService): IEmployeeController {
+open class EmployeeController(@Autowired private val employeeService: IEmployeeBusinessService) : IEmployeeController {
 
     override fun getEmployees(): List<EmployeeDto?>? {
         return employeeService!!.findAll()

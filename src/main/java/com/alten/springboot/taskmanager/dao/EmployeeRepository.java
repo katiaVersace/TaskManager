@@ -6,7 +6,7 @@ import com.alten.springboot.taskmanager.model.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
-	public Employee findByUserName(String userName);
+    public Employee findByUserName(String userName);
 
 }
 

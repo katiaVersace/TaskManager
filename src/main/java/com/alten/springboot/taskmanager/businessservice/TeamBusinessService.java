@@ -130,7 +130,7 @@ public class TeamBusinessService implements ITeamBusinessService {
         teams.stream().forEach(t -> {
                     IntStream.range(current_emp.get(), current_emp.get() + employees_for_team + difference.get())
 
-                    .forEach(i -> t.getEmployees().add(employees.get(i)));
+                            .forEach(i -> t.getEmployees().add(employees.get(i)));
                     current_emp.addAndGet(employees_for_team + difference.get());
                     difference.set(0);
                 }
@@ -206,15 +206,16 @@ public class TeamBusinessService implements ITeamBusinessService {
         } else {
 
             //PERSIST
-            theTaskDto = visitedTasks.stream().filter(t -> oldAssignments.get(t) == null).map(t-> {
-                t=taskDataService.save(t);
-               return modelMapper.map(t, TaskDto.class);})
+            theTaskDto = visitedTasks.stream().filter(t -> oldAssignments.get(t) == null).map(t -> {
+                t = taskDataService.save(t);
+                return modelMapper.map(t, TaskDto.class);
+            })
                     .findFirst().orElse(null);
 
 
             taskDataService.saveAll(visitedTasks);
-            List<Employee> employeesToSave = new ArrayList<>(visitedTasks.stream().map(t->t.getEmployee()).collect(Collectors.toList()));
-            employeesToSave.addAll(oldAssignments.entrySet().stream().map(entry -> entry.getValue()).filter(e->e!=null).collect(Collectors.toList()));
+            List<Employee> employeesToSave = new ArrayList<>(visitedTasks.stream().map(t -> t.getEmployee()).collect(Collectors.toList()));
+            employeesToSave.addAll(oldAssignments.entrySet().stream().map(entry -> entry.getValue()).filter(e -> e != null).collect(Collectors.toList()));
             employeeDataService.saveAll(employeesToSave);
 
             //OUTPUT

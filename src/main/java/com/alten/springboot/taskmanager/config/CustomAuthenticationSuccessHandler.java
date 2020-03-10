@@ -19,29 +19,29 @@ import com.alten.springboot.taskmanager.dto.EmployeeDto;
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-	@Autowired
-	private IEmployeeDataService employeeService;
+    @Autowired
+    private IEmployeeDataService employeeService;
 
-	@Autowired
-	private ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-			Authentication authentication) throws IOException, ServletException {
-
-
-		String userName = authentication.getName();
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                                        Authentication authentication) throws IOException, ServletException {
 
 
-		EmployeeDto theUser = modelMapper.map(employeeService.findByUserName(userName), EmployeeDto.class);
+        String userName = authentication.getName();
 
-		// now place in the session
-		HttpSession session = request.getSession();
-		session.setAttribute("user", theUser);
 
-		// forward to home page
+        EmployeeDto theUser = modelMapper.map(employeeService.findByUserName(userName), EmployeeDto.class);
 
-		response.sendRedirect(request.getContextPath() + "/");
-	}
+        // now place in the session
+        HttpSession session = request.getSession();
+        session.setAttribute("user", theUser);
+
+        // forward to home page
+
+        response.sendRedirect(request.getContextPath() + "/");
+    }
 
 }

@@ -35,8 +35,8 @@ public class TaskBusinessService implements ITaskBusinessService {
     @Override
     public TaskDto findById(int taskId) {
         Task task = taskDataService.findById(taskId);
-        return (task != null) ?  modelMapper.map(task, TaskDto.class) : null;
-        }
+        return (task != null) ? modelMapper.map(task, TaskDto.class) : null;
+    }
 
     @Override
     public TaskDto save(TaskDto taskDto) {
@@ -51,6 +51,7 @@ public class TaskBusinessService implements ITaskBusinessService {
             taskDto = modelMapper.map(taskDataService.save(task), TaskDto.class);
             employeeDataService.update(employee);
         }
+
         return taskDto;
     }
 

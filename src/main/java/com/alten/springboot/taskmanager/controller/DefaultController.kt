@@ -12,7 +12,7 @@ class DefaultController {
 
     @GetMapping("/")
     @ApiOperation(value = "Home", response = String::class)
-    fun getHome(): String ="Home"
+    fun getHome(): String = "Home"
 
     @ApiOperation(value = "CRSF token", response = CsrfToken::class)
     @GetMapping("/csrf")

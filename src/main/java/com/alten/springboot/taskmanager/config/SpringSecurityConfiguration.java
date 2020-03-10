@@ -19,59 +19,60 @@ import com.alten.springboot.taskmanager.dataservice.IEmployeeDataService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-	// add a reference to our security data source
-	@Autowired
-	private IEmployeeDataService employeeService;
+    // add a reference to our security data source
+    @Autowired
+    private IEmployeeDataService employeeService;
 
-	@Autowired
-	private CustomAccessDeniedHandler accessDeniedHandler;
+    @Autowired
+    private CustomAccessDeniedHandler accessDeniedHandler;
 
-	@Autowired
-	private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    @Autowired
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(authenticationProvider());
-	}
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(authenticationProvider());
+    }
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
 
-		http.csrf().disable().authorizeRequests().antMatchers("/auth/login").permitAll()
-				.antMatchers("/employees/**").authenticated()
-				.antMatchers("/tasks/**").authenticated()
-				.antMatchers("/teams/**").authenticated()
-				.antMatchers("/auth/**").authenticated()
-				.and().formLogin().successHandler(customAuthenticationSuccessHandler).permitAll().and().logout()
-				.deleteCookies("JSESSIONID")
-				.and().rememberMe().key("uniqueAndSecret").tokenValiditySeconds(86400).and().exceptionHandling()
-				.accessDeniedHandler(accessDeniedHandler);
 
-	}
+        http.csrf().disable().authorizeRequests().antMatchers("/auth/login").permitAll()
+                .antMatchers("/employees/**").authenticated()
+                .antMatchers("/tasks/**").authenticated()
+                .antMatchers("/teams/**").authenticated()
+                .antMatchers("/auth/**").authenticated()
+                .and().formLogin().successHandler(customAuthenticationSuccessHandler).permitAll().and().logout()
+                .deleteCookies("JSESSIONID")
+                .and().rememberMe().key("uniqueAndSecret").tokenValiditySeconds(86400).and().exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler);
 
-	// authenticationProvider bean definition
-	@Bean
-	public DaoAuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
-		auth.setUserDetailsService(employeeService); // set the custom user details service
-		return auth;
-	}
+    }
 
-	@Bean("authenticationManager")
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
+    // authenticationProvider bean definition
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
+        auth.setUserDetailsService(employeeService); // set the custom user details service
+        return auth;
+    }
 
-	@Bean
-	public CommonsRequestLoggingFilter logFilter() {
-		CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
-		filter.setIncludeQueryString(true);
-		filter.setIncludePayload(true);
-		filter.setMaxPayloadLength(10000);
-		filter.setIncludeHeaders(false);
-		filter.setAfterMessagePrefix("REQUEST DATA : ");
-		return filter;
-	}
+    @Bean("authenticationManager")
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public CommonsRequestLoggingFilter logFilter() {
+        CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
+        filter.setIncludeQueryString(true);
+        filter.setIncludePayload(true);
+        filter.setMaxPayloadLength(10000);
+        filter.setIncludeHeaders(true);
+        filter.setAfterMessagePrefix("REQUEST DATA : ");
+        return filter;
+    }
 
 }

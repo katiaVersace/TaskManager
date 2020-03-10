@@ -9,10 +9,9 @@ import com.alten.springboot.taskmanager.dto.TaskDto;
 import com.alten.springboot.taskmanager.dto.TeamDto;
 import com.alten.springboot.taskmanager.model.Task;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,10 +37,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TaskmanagerSpringBootApplication.class)
 @AutoConfigureMockMvc
 
-public class TestApplicationTests {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class TestRandomPopulation {
 
-    private static final String START_DATE = "2020-02-15";
-    private static final String END_DATE = "2020-02-29";
+    private static final String START_DATE = "2020-03-15";
+    private static final String END_DATE = "2020-03-29";
     private static final int TEAMS_SIZE = 1;
     private static final int EMPLOYEES_SIZE = 10;
     private static final int TASKS_SIZE = 20;
@@ -77,39 +77,40 @@ public class TestApplicationTests {
         input.setTasks_size(TASKS_SIZE);
         input.setTask_max_duration(TASK_MAX_DURATION);
 
-        MvcResult result =mvc.perform( MockMvcRequestBuilders
+        mvc.perform(MockMvcRequestBuilders
                 .post("/teams/randomPopulation")
                 .content(mapper.writeValueAsString(input))
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)).andReturn();
+                .accept(MediaType.APPLICATION_JSON));
 
     }
 
 
     @Test
-    public void testEmployeeAfterRandomPopulation() throws Exception {
+    public void testResourcesAfterRandomPopulation() throws Exception {
         MvcResult result = mvc.perform(get("/employees").contentType(MediaType.APPLICATION_JSON)).andReturn();
         List<EmployeeDto> employees = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, EmployeeDto.class));
         //+1 PERCHÈ L'ADMIN ESISTE GIA'
-        Assert.assertEquals(EMPLOYEES_SIZE+1,employees.size());
+        Assert.assertEquals(EMPLOYEES_SIZE + 1, employees.size());
 
         result = mvc.perform(get("/teams").contentType(MediaType.APPLICATION_JSON)).andReturn();
         List<TeamDto> teams = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, TeamDto.class));
-        Assert.assertEquals(TEAMS_SIZE,teams.size());
+        Assert.assertEquals(TEAMS_SIZE, teams.size());
 
         result = mvc.perform(get("/tasks").contentType(MediaType.APPLICATION_JSON)).andReturn();
         List<TaskDto> tasks = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, TaskDto.class));
-        Assert.assertEquals(TASKS_SIZE,tasks.size());
+        Assert.assertEquals(TASKS_SIZE, tasks.size());
     }
 
-    @Test
-    public void testConstraintOneTaskForDay() throws Exception {
+
+    @After
+    public void checkConstraintOneTaskForDay() throws Exception {
         MvcResult result = mvc.perform(get("/tasks").contentType(MediaType.APPLICATION_JSON)).andReturn();
         List<TaskDto> tasks = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, TaskDto.class));
-       AtomicBoolean violation = new AtomicBoolean(false);
-        tasks.stream().filter(t-> {
+        AtomicBoolean violation = new AtomicBoolean(false);
+        tasks.stream().filter(t -> {
             try {
-                return anotherTaskInSamePeriod(t.getEmployeeId(),LocalDate.parse(t.getExpectedStartTime()), LocalDate.parse(t.getExpectedEndTime()), t.getId());
+                return anotherTaskInSamePeriod(t.getEmployeeId(), LocalDate.parse(t.getExpectedStartTime()), LocalDate.parse(t.getExpectedEndTime()), t.getId());
             } catch (Exception e) {
                 e.printStackTrace();
                 return true;
@@ -119,16 +120,16 @@ public class TestApplicationTests {
     }
 
     private boolean anotherTaskInSamePeriod(int employee_id, LocalDate start, LocalDate end, int task_id) throws Exception {
-        MvcResult result = mvc.perform(get("/tasks/tasksByEmployee/"+employee_id+"/").contentType(MediaType.APPLICATION_JSON)).andReturn();
+        MvcResult result = mvc.perform(get("/tasks/tasksByEmployee/" + employee_id + "/").contentType(MediaType.APPLICATION_JSON)).andReturn();
         List<TaskDto> tasksByEmployee = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, TaskDto.class));
         List<TaskDto> tasksInPeriod = tasksByEmployee.parallelStream().filter(t -> (EmployeeBusinessService.betweenTwoDate(start, LocalDate.parse(t.getExpectedStartTime()), LocalDate.parse(t.getExpectedEndTime()))
                 || EmployeeBusinessService.betweenTwoDate(end, LocalDate.parse(t.getExpectedStartTime()), LocalDate.parse(t.getExpectedEndTime()))
                 || EmployeeBusinessService.betweenTwoDate(LocalDate.parse(t.getExpectedStartTime()), start, end)
                 || EmployeeBusinessService.betweenTwoDate(LocalDate.parse(t.getExpectedEndTime()), start, end))
-                && t.getId()!=task_id)
+                && t.getId() != task_id)
                 .collect(Collectors.toList());
 
-        return tasksInPeriod.size()>0;
+        return tasksInPeriod.size() > 0;
     }
 
 
